@@ -1,8 +1,12 @@
+"""Module with commands for the player."""
+
 import cmd
 from Game import Game
 
 
 class Output(cmd.Cmd):
+    """Class with methods to interact with the player."""
+
     intro = "Welcome to the pig-game. Type help or ? to list commands.\n"
     prompt = "(pig-game) "
     completekey = "tab"
@@ -14,23 +18,27 @@ class Output(cmd.Cmd):
 
     def do_start(self, _):
         """Start a new game."""
-        if (self.game.start()):
+        if self.game.start():
             print("Game started, player one starts!")
         else:
             print("Please identify yourself!")
 
     def do_create(self, arg):
+        r"""Create players. Try: \"create John Amanda\"."""
         args = arg.split()
         msg = self.game.create_player(args)
         print(msg)
 
     def do_player_amount(self, arg):
-        """Set the amount of players.
+        """
+        Set the amount of players.
+
         If set to 1 the player will play against the computer.
         If set to another value the players will play against each other
-        Maxmimum amount of players is 6"""
-        msg = "Missing argument, provide the amount of players. \
-Try: \"player_amount 1\""
+        Maxmimum amount of players is 6
+        """
+        msg = 'Missing argument, provide the amount of players. \
+Try: "player_amount 1"'
         if not arg:
             print(msg)
             return
