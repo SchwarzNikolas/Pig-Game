@@ -1,6 +1,9 @@
+"We rolling dice baby"
 import random
 
+
 class Dice:
+    "This here the dice"
     def __init__(self):
         self.num = 0
         
