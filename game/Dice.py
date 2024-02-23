@@ -7,6 +7,3 @@ class Dice:
     def roll(self):
         return random.randint(1, 6)
     
-dice = Dice()
-num = dice.roll()
-print(num)
