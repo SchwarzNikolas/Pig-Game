@@ -4,5 +4,6 @@ __pycache__
 htmlcov/
 *.pyc
 dice/doc
-guess/doc
+game/doc
 build/
+game/players.dat
