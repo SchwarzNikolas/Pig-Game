@@ -1,6 +1,6 @@
 """Module with the game logic."""
 
-from Player import Player
+from player import Player
 
 
 class Game:
