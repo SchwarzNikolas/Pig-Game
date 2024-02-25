@@ -1,33 +1,20 @@
 """Module with commands for the player."""
 
-import cmd
+from cmd import Cmd
 from Game import Game
 
 
-class Output(cmd.Cmd):
+class Output(Cmd):
     """Class with methods to interact with the player."""
 
     intro = "Welcome to the pig-game. Type help or ? to list commands.\n"
-    prompt = "(pig-game) "
+    Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
     def __init__(self):
         """Initialize the Object."""
         super().__init__()
         self.game = Game()
-
-    def do_start(self, _):
-        """Start a new game."""
-        if self.game.start():
-            print("Game started, player one starts!")
-        else:
-            print("Please identify yourself!")
-
-    def do_create(self, arg):
-        r"""Create players. Try: \"create John Amanda\"."""
-        args = arg.split()
-        msg = self.game.create_player(args)
-        print(msg)
 
     def do_player_amount(self, arg):
         """
@@ -48,7 +35,27 @@ Try: "player_amount 1"'
         except (ValueError, TypeError) as err:
             print(err)
 
+    def do_create(self, arg):
+        r"""Create players. Try: \"create John Amanda\"."""
+        args = arg.split()
+        msg = self.game.create_player(args)
+        print(msg)
+
+    def do_start(self, _):
+        """Start a new game."""
+        if self.game.start():
+            print("Game started, player one starts!")
+        else:
+            print("Please identify yourself!")
+
+    def do_roll(self, _):
+        """Roll the dice."""
+        Cmd.prompt = "(Player 1) "
+        msg = self.game.roll()
+        print(msg)
+
     def do_exit(self, _):
         """Exit the game."""
-        print("Thank you for playing!")
+        msg = self.game.exit()
+        print(msg)
         return True

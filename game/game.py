@@ -1,6 +1,8 @@
 """Module with the game logic."""
 
-from Player import Player
+from player import Player
+from dice import Dice
+import pickle
 
 
 class Game:
@@ -9,8 +11,14 @@ class Game:
     def __init__(self):
         """Initialize Object."""
         self.players = []
-        self.game_state = None
+        try:
+            with open("players.dat", "rb") as file:
+                self.player = pickle.load(file)
+        except FileNotFoundError:
+            print("No saved players found.")
+        self.game_state = -1
         self.amount_players = 0
+        self.dice = Dice()
 
     def start(self):
         """Start a new game."""
@@ -40,4 +48,15 @@ class Game:
 
     def roll(self):
         """Player decides to roll the dice."""
-        print("test")
+        if self.game_state < 0:
+            return "No active game!"
+        dice_num = Dice.roll()
+        if dice_num == 1:
+            return f"{self.players[self.game_state].name}\
+has rolled a 1 and lost all points this round."
+        return f"{self.players[self.game_state].name} has rolled a {dice_num}."
+
+    def exit(self):
+        """Save players and exit"""
+        with open("players.dat", "wb") as file:
+            pickle.dump(self.players, file)
