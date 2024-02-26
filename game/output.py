@@ -1,8 +1,7 @@
 """Module with commands for the player."""
 
 from cmd import Cmd
-from Game import Game
-
+from game import Game
 
 class Output(Cmd):
     """Class with methods to interact with the player."""

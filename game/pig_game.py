@@ -1,8 +1,8 @@
 """Module with the game logic."""
 
+import pickle
 from player import Player
 from dice import Dice
-import pickle
 
 
 class Game:
@@ -50,7 +50,8 @@ class Game:
         """Player decides to roll the dice."""
         if self.game_state < 0:
             return "No active game!"
-        dice_num = Dice.roll()
+        dice = Dice()
+        dice_num = dice.roll()
         if dice_num == 1:
             return f"{self.players[self.game_state].name}\
 has rolled a 1 and lost all points this round."
