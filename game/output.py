@@ -7,7 +7,13 @@ from pig_game import Game
 class Output(Cmd):
     """Class with methods to interact with the player."""
 
-    intro = "Welcome to the pig-game. Type help or ? to list commands.\n"
+    pink_pig_colour = "\33[95m"
+    welcome_colour = "\33[42m"
+    round_over_colour = "\33[91m"
+    winning_colour = "\33[92m"
+    keep_going_colour = "\33[94m"
+    end_colour = "\033[0m"
+    intro = f"{welcome_colour}Welcome to the pig-game.{end_colour}\nType help or ? to list commands.\n"
     Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
