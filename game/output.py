@@ -8,12 +8,14 @@ class Output(Cmd):
     """Class with methods to interact with the player."""
 
     pink_pig_colour = "\33[95m"
-    welcome_colour = "\33[42m"
+    welcome_colour = "\33[43m"
     round_over_colour = "\33[91m"
     winning_colour = "\33[92m"
     keep_going_colour = "\33[94m"
     end_colour = "\033[0m"
-    intro = f"{welcome_colour}Welcome to the pig-game.{end_colour}\nType help or ? to list commands.\n"
+    flashing_effect = "\33[5m"
+    italics = "\33[3m"
+    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\nType help or ? to list commands.\n"
     Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
