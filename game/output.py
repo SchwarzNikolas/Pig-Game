@@ -1,7 +1,8 @@
 """Module with commands for the player."""
 
 from cmd import Cmd
-from game import Game
+from pig_game import Game
+
 
 class Output(Cmd):
     """Class with methods to interact with the player."""
@@ -23,16 +24,6 @@ class Output(Cmd):
         If set to another value the players will play against each other
         Maxmimum amount of players is 6
         """
-        msg = 'Missing argument, provide the amount of players. \
-Try: "player_amount 1"'
-        if not arg:
-            print(msg)
-            return
-
-        try:
-            msg = self.game.player_amount(int(arg))
-        except (ValueError, TypeError) as err:
-            print(err)
 
     def do_create(self, arg):
         r"""Create players. Try: \"create John Amanda\"."""
@@ -40,8 +31,13 @@ Try: "player_amount 1"'
         msg = self.game.create_player(args)
         print(msg)
 
-    def do_start(self, _):
-        """Start a new game."""
+    def do_start(self, args):
+        r"""
+        Start a new game. Usage: \"start John Jane\".
+
+        After the start keyword provide playernames.
+        If AI is enabled it will automatically join the game.
+        """
         if self.game.start():
             print("Game started, player one starts!")
         else:
