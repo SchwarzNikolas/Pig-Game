@@ -8,14 +8,13 @@ class Output(Cmd):
     """Class with methods to interact with the player."""
 
     pink_pig_colour = "\33[95m"
-    welcome_colour = "\33[43m"
+    welcome_colour = "\33[42m"
     round_over_colour = "\33[91m"
     winning_colour = "\33[92m"
     keep_going_colour = "\33[94m"
     end_colour = "\033[0m"
-    flashing_effect = "\33[5m"
-    italics = "\33[3m"
-    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\nType help or ? to list commands.\n"
+    intro = f"{welcome_colour}Welcome to the pig-game.{end_colour}\
+\nType help or ? to list commands.\n"
     Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
@@ -25,14 +24,13 @@ class Output(Cmd):
         self.game = Game()
 
     def do_create(self, arg):
-        r"""Create players. Try: \"create John Amanda\"."""
+        r"""Create players. Try: "create John Jane"."""
         args = arg.split()
-        msg = self.game.create_player(args)
-        print(msg)
+        self.game.create_player(args)
 
     def do_start(self, args):
-        r"""
-        Start a new game. Usage: \"start John Jane\".
+        """
+        Start a new game. Usage: "start John Jane".
 
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
@@ -42,10 +40,10 @@ class Output(Cmd):
             print(msg)
             return
         try:
-            if self.game.start(args):
-                print("Game started, player one starts!")
-            else:
-                print("Please identify yourself!")
+            first_player = self.game.start(args)
+            if first_player is not False:
+                print(f"Game started, {first_player.player_name} begins!")
+                Cmd.prompt = f"({first_player.player_name}) "
         except (ValueError, TypeError) as err:
             print(err)
 

@@ -13,38 +13,48 @@ class Game:
         self.players = []
         try:
             with open("players.dat", "rb") as file:
-                self.player = pickle.load(file)
+                self.players = pickle.load(file)
         except FileNotFoundError:
             print("No saved players found.")
+        self.active_players = []
         self.game_state = -1
         self.amount_players = 0
         self.dice = Dice()
 
-    def start(self):
+    def start(self, args):
         """Start a new game."""
-        if len(self.players) < 1:
-            return False
-        for player in self.players:
-            if not isinstance(player, Player):
+        player_names = args.split()
+        if len(player_names) > 6 or len(player_names) < 1:
+            raise ValueError("The amount of players must be between 1 and 6.")
+        self.amount_players = len(player_names)
+
+        for name in player_names:
+            player_exists = False
+            for player in self.players:
+                if player.player_name == name:
+                    player_exists = True
+                    self.active_players.append(player)
+                    break
+            if not player_exists:
+                print(f"Player {name} doesnt have a profile yet!")
                 return False
+
         self.game_state = 0
-        return True
+        return self.active_players[0]
 
     def create_player(self, names):
         """Create players with a list of names."""
-        if self.amount_players < 1:
-            return "Please set the amount of players first!"
-        for i in range(self.amount_players):
-            self.players.append(Player(names[i]))
-            print(f"Player {names[i]} has been created!")
-        return "All players have been created!"
-
-    def player_amount(self, num):
-        """Set the player amount."""
-        if num > 6 or num < 1:
-            raise ValueError("The amount of players must be between 1 and 6.")
-
-        self.amount_players = num
+        for name in names:
+            taken = 0
+            if len(self.players) > 0:
+                for existing_player in self.players:
+                    if name == existing_player.player_name:
+                        print(f"Playername {name} is already taken!")
+                        taken = 1
+                        break
+            if not taken:
+                self.players.append(Player(name))
+                print(f"Player {name} has been created!")
 
     def roll(self):
         """Player decides to roll the dice."""
@@ -61,3 +71,4 @@ has rolled a 1 and lost all points this round."
         """Save players and exit"""
         with open("players.dat", "wb") as file:
             pickle.dump(self.players, file)
+        return "Thank you for playing!"
