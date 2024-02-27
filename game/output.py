@@ -22,15 +22,6 @@ class Output(Cmd):
         super().__init__()
         self.game = Game()
 
-    def do_player_amount(self, arg):
-        """
-        Set the amount of players.
-
-        If set to 1 the player will play against the computer.
-        If set to another value the players will play against each other
-        Maxmimum amount of players is 6
-        """
-
     def do_create(self, arg):
         r"""Create players. Try: \"create John Amanda\"."""
         args = arg.split()
@@ -44,10 +35,17 @@ class Output(Cmd):
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
         """
-        if self.game.start():
-            print("Game started, player one starts!")
-        else:
-            print("Please identify yourself!")
+        msg = "Missing argument, provide player names"
+        if not args:
+            print(msg)
+            return
+        try:
+            if self.game.start(args):
+                print("Game started, player one starts!")
+            else:
+                print("Please identify yourself!")
+        except (ValueError, TypeError) as err:
+            print(err)
 
     def do_roll(self, _):
         """Roll the dice."""
