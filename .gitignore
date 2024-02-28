@@ -6,5 +6,5 @@ htmlcov/
 dice/doc
 game/doc
 build/
-game/players.dat
+*.dat
 .vscode/*

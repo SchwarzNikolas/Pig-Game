@@ -15,7 +15,8 @@ class Output(Cmd):
     end_colour = "\033[0m"
     flashing_effect = "\33[5m"
     italics = "\33[3m"
-    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\nType help or ? to list commands.\n"
+    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\
+\nType help or ? to list commands.\n"
     Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
@@ -24,10 +25,43 @@ class Output(Cmd):
         super().__init__()
         self.game = Game()
 
-    def do_create(self, arg):
-        r"""Create players. Try: "create John Jane"."""
-        args = arg.split()
-        self.game.create_player(args)
+    def do_profile(self, args):
+        """
+        Player profile settings.
+
+        Arguments:
+            -c: create Players  [profile -c John,Jane]
+            -r: rename Player   [profile -r John]
+            -d: delete Player   [profile -d John]
+        """
+        args = args.split()
+        if not args:
+            print("No arguments given!")
+            return
+
+        try:
+            playername = args[1]
+        except IndexError:
+            if args[0] in ["-d", "-r", "-c"]:
+                print("No playername provided!")
+            else:
+                print("Garbage argument. Use \"help profile\".")
+        else:
+            match args[0]:
+                case "-c":
+                    self.game.create_player(playername.split(","))
+                case "-r":
+                    if self.game.rename_player(playername):
+                        print("Playername sucessfully changed!")
+                    else:
+                        print(f"Player {playername} doesn't exist.")
+                case "-d":
+                    if self.game.delete_player(playername):
+                        print(f"Player {playername} has been deleted.")
+                    else:
+                        print(f"Player {playername} doesn't exist.")
+                case _:
+                    print("Garbage argument. Use \"help profile\".")
 
     def do_start(self, args):
         """
