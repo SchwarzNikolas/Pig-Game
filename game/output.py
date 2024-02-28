@@ -15,7 +15,8 @@ class Output(Cmd):
     end_colour = "\033[0m"
     flashing_effect = "\33[5m"
     italics = "\33[3m"
-    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\nType help or ? to list commands.\n"
+    intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\
+\nType help or ? to list commands.\n"
     Cmd.prompt = "(pig-game) "
     completekey = "tab"
 
@@ -24,10 +25,37 @@ class Output(Cmd):
         super().__init__()
         self.game = Game()
 
-    def do_create(self, arg):
-        r"""Create players. Try: "create John Jane"."""
-        args = arg.split()
-        self.game.create_player(args)
+    def do_profile(self, args):
+        """
+        Player profile settings.
+
+        Arguments:
+            -c: create Players  [profile -c John,Jane]
+            -r: rename Player   [profile -r John
+            -d: delete Player   [profile -d John
+        """
+        args = args.split()
+        if not args:
+            print("No arguments given!")
+            return
+        match args[0]:
+            case "-c":
+                try:
+                    self.game.create_player(args[1].split(","))
+                except IndexError:
+                    print("No playernames provided!")
+            case "-r":
+                try:
+                    if self.game.rename_player(args[1]):
+                        print("Playername sucessfully changed!")
+                    else:
+                        print(f"Player {args[1]} doesn't exist.")
+                except IndexError:
+                    print("No playername provided!")
+            case "d":
+                pass
+            case _:
+                print("Garbage argument. Use help profile to list  agruments.")
 
     def do_start(self, args):
         """

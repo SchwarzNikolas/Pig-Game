@@ -56,6 +56,23 @@ class Game:
                 self.players.append(Player(name))
                 print(f"Player {name} has been created!")
 
+    def rename_player(self, name):
+        for player in self.players:
+            if player.player_name == name:
+                player.change_name()
+                return True
+        return False
+
+    def delete_player(self, name):
+        for player in self.players:
+            if player.player_name == name:
+                confirm = input(f"Proceed with deleting Player {name}? [y/N] ")
+                confirm.lower()
+                if confirm == "y":
+                    self.players.remove(player)
+                    return True
+        return False
+
     def roll(self):
         """Player decides to roll the dice."""
         if self.game_state < 0:
