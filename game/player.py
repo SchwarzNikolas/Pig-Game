@@ -5,11 +5,12 @@ from dicehand import DiceHand
 
 
 class Player:
-    """The Blueprint for a Player."""
+    """Blueprint for a Player."""
 
     def __init__(self, player_name):
         """Beginning of a New Player."""
         self.player_name = player_name
+        self.dice_holder = DiceHand()
         self.highscore_least_rolls = 0
         self.highscore_least_rounds = 0
 
@@ -27,6 +28,9 @@ class Player:
 
     def roll_dice(self):
         """Decides Fate."""
+        dice = Dice()
+        roll_number = dice.roll()
 
     def return_stats(self):
         """Museum of your previous games."""
+
