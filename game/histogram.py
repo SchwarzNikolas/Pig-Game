@@ -6,7 +6,10 @@ class Histogram:
     
     def barchart(self):
         number = 10
-        print(f"{'∎' * number} -> {number}") 
+        player_name = "isaac"
+        print(f"{player_name} | 
+        
+              {'∎' * number}{number}") 
 
 
 histogram = Histogram()
