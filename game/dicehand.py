@@ -1,27 +1,34 @@
-"Using result of rolling dice"
+"""Using result of rolling dice."""
+
 
 class DiceHand:
-    "Keeps track of integer variables and returns them with getters"
+    """Keeps track of integer variables and returns them with getters."""
 
     def __init__(self):
-        self.points = 0
+        """Initialize self."""
+        self.roundpoints = 0
         self.rounds = 0
-        self.rollamount = 0
+        self.amountOfRolls = 0
+        self.totalpoints = 0
 
-    def updateHand(self, diceroll):
+    def update_Hand(self, diceroll):
+        """Update values of object."""
         if diceroll != 1:
-            self.points += diceroll
-            self.rollamount += 1
+            self.roundpoints += diceroll
+            self.amountOfRolls += 1
+            return True
         else:
-            "placeholder for sending result to highscore/histogram"
-            self.points = 0
+            self.amountOfRolls += 1
+            self.roundpoints = 0
             self.rounds += 1
+            return False
 
-    def getRoundPoints(self):
-        return self.points
+    def hold(self):
+        """End round."""
+        self.totalpoints += self.roundpoints
+        self.roundpoints = 0
+        self.rounds += 1
 
-    def getRoundsplayed(self):
-        return self.rounds
-
-    def getRollAmount(self):
-        return self.rollamount
+    def get_stats(self):
+        """Get stats."""
+        return self.amountOfRolls, self.rounds, self.totalpoints
