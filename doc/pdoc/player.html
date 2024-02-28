@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>main API documentation</title>
-<meta name="description" content="File to start the Pig-Game." />
+<title>player API documentation</title>
+<meta name="description" content="The Module with the Player blueprint." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,26 +19,46 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>main</code></h1>
+<h1 class="title">Module <code>player</code></h1>
 </header>
 <section id="section-intro">
-<p>File to start the Pig-Game.</p>
+<p>The Module with the Player blueprint.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;File to start the Pig-Game.&#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34;The Module with the Player blueprint.&#34;&#34;&#34;
 
-from output import Output
-
-
-def main():
-    &#34;&#34;&#34;Execute the game loop.&#34;&#34;&#34;
-    Output().cmdloop()
+from dice import Dice
+from dicehand import DiceHand
 
 
-if __name__ == &#34;__main__&#34;:
-    main()</code></pre>
+class Player:
+    &#34;&#34;&#34;The Blueprint for a Player.&#34;&#34;&#34;
+
+    def __init__(self, player_name):
+        &#34;&#34;&#34;Beginning of a New Player.&#34;&#34;&#34;
+        self.player_name = player_name
+        self.highscore_least_rolls = 0
+        self.highscore_least_rounds = 0
+
+    def reset_player_stats(self):
+        &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+        confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
+        confirmation.lower()
+        if confirmation == &#34;y&#34;:
+            self.highscore_least_rolls = 0
+            self.highscore_least_rounds = 0
+
+    def change_name(self):
+        &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+        self.player_name = input(&#34;Please enter your new player name: &#34;)
+
+    def roll_dice(self):
+        &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;
+
+    def return_stats(self):
+        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -46,25 +66,111 @@ if __name__ == &#34;__main__&#34;:
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="main.main"><code class="name flex">
-<span>def <span class="ident">main</span></span>(<span>)</span>
+<dt id="player.Player"><code class="flex name class">
+<span>class <span class="ident">Player</span></span>
+<span>(</span><span>player_name)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Execute the game loop.</p></div>
+<div class="desc"><p>The Blueprint for a Player.</p>
+<p>Beginning of a New Player.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def main():
-    &#34;&#34;&#34;Execute the game loop.&#34;&#34;&#34;
-    Output().cmdloop()</code></pre>
+<pre><code class="python">class Player:
+    &#34;&#34;&#34;The Blueprint for a Player.&#34;&#34;&#34;
+
+    def __init__(self, player_name):
+        &#34;&#34;&#34;Beginning of a New Player.&#34;&#34;&#34;
+        self.player_name = player_name
+        self.highscore_least_rolls = 0
+        self.highscore_least_rounds = 0
+
+    def reset_player_stats(self):
+        &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+        confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
+        confirmation.lower()
+        if confirmation == &#34;y&#34;:
+            self.highscore_least_rolls = 0
+            self.highscore_least_rounds = 0
+
+    def change_name(self):
+        &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+        self.player_name = input(&#34;Please enter your new player name: &#34;)
+
+    def roll_dice(self):
+        &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;
+
+    def return_stats(self):
+        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="player.Player.change_name"><code class="name flex">
+<span>def <span class="ident">change_name</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Alter the Identity of the Player.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def change_name(self):
+    &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+    self.player_name = input(&#34;Please enter your new player name: &#34;)</code></pre>
+</details>
+</dd>
+<dt id="player.Player.reset_player_stats"><code class="name flex">
+<span>def <span class="ident">reset_player_stats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Beginning for an Existing Player.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_player_stats(self):
+    &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+    confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
+    confirmation.lower()
+    if confirmation == &#34;y&#34;:
+        self.highscore_least_rolls = 0
+        self.highscore_least_rounds = 0</code></pre>
+</details>
+</dd>
+<dt id="player.Player.return_stats"><code class="name flex">
+<span>def <span class="ident">return_stats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Museum of your previous games.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def return_stats(self):
+    &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="player.Player.roll_dice"><code class="name flex">
+<span>def <span class="ident">roll_dice</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Decides Fate.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def roll_dice(self):
+    &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 </dl>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -73,9 +179,17 @@ if __name__ == &#34;__main__&#34;:
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-functions">Functions</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="player.Player" href="#player.Player">Player</a></code></h4>
 <ul class="">
-<li><code><a title="main.main" href="#main.main">main</a></code></li>
+<li><code><a title="player.Player.change_name" href="#player.Player.change_name">change_name</a></code></li>
+<li><code><a title="player.Player.reset_player_stats" href="#player.Player.reset_player_stats">reset_player_stats</a></code></li>
+<li><code><a title="player.Player.return_stats" href="#player.Player.return_stats">return_stats</a></code></li>
+<li><code><a title="player.Player.roll_dice" href="#player.Player.roll_dice">roll_dice</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

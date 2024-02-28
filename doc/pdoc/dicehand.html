@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>main API documentation</title>
-<meta name="description" content="File to start the Pig-Game." />
+<title>dicehand API documentation</title>
+<meta name="description" content="Using result of rolling dice" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,26 +19,41 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>main</code></h1>
+<h1 class="title">Module <code>dicehand</code></h1>
 </header>
 <section id="section-intro">
-<p>File to start the Pig-Game.</p>
+<p>Using result of rolling dice</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;File to start the Pig-Game.&#34;&#34;&#34;
+<pre><code class="python">&#34;Using result of rolling dice&#34;
 
-from output import Output
+class DiceHand:
+    &#34;Keeps track of integer variables and returns them with getters&#34;
 
+    def __init__(self):
+        self.points = 0
+        self.rounds = 0
+        self.rollamount = 0
 
-def main():
-    &#34;&#34;&#34;Execute the game loop.&#34;&#34;&#34;
-    Output().cmdloop()
+    def updateHand(self, diceroll):
+        if diceroll != 1:
+            self.points += diceroll
+            self.rollamount += 1
+        else:
+            &#34;placeholder for sending result to highscore/histogram&#34;
+            self.points = 0
+            self.rounds += 1
 
+    def getRoundPoints(self):
+        return self.points
 
-if __name__ == &#34;__main__&#34;:
-    main()</code></pre>
+    def getRoundsplayed(self):
+        return self.rounds
+
+    def getRollAmount(self):
+        return self.rollamount</code></pre>
 </details>
 </section>
 <section>
@@ -46,25 +61,108 @@ if __name__ == &#34;__main__&#34;:
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="main.main"><code class="name flex">
-<span>def <span class="ident">main</span></span>(<span>)</span>
+<dt id="dicehand.DiceHand"><code class="flex name class">
+<span>class <span class="ident">DiceHand</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Execute the game loop.</p></div>
+<div class="desc"><p>Keeps track of integer variables and returns them with getters</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def main():
-    &#34;&#34;&#34;Execute the game loop.&#34;&#34;&#34;
-    Output().cmdloop()</code></pre>
+<pre><code class="python">class DiceHand:
+    &#34;Keeps track of integer variables and returns them with getters&#34;
+
+    def __init__(self):
+        self.points = 0
+        self.rounds = 0
+        self.rollamount = 0
+
+    def updateHand(self, diceroll):
+        if diceroll != 1:
+            self.points += diceroll
+            self.rollamount += 1
+        else:
+            &#34;placeholder for sending result to highscore/histogram&#34;
+            self.points = 0
+            self.rounds += 1
+
+    def getRoundPoints(self):
+        return self.points
+
+    def getRoundsplayed(self):
+        return self.rounds
+
+    def getRollAmount(self):
+        return self.rollamount</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="dicehand.DiceHand.getRollAmount"><code class="name flex">
+<span>def <span class="ident">getRollAmount</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRollAmount(self):
+    return self.rollamount</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.getRoundPoints"><code class="name flex">
+<span>def <span class="ident">getRoundPoints</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRoundPoints(self):
+    return self.points</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.getRoundsplayed"><code class="name flex">
+<span>def <span class="ident">getRoundsplayed</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getRoundsplayed(self):
+    return self.rounds</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.updateHand"><code class="name flex">
+<span>def <span class="ident">updateHand</span></span>(<span>self, diceroll)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def updateHand(self, diceroll):
+    if diceroll != 1:
+        self.points += diceroll
+        self.rollamount += 1
+    else:
+        &#34;placeholder for sending result to highscore/histogram&#34;
+        self.points = 0
+        self.rounds += 1</code></pre>
 </details>
 </dd>
 </dl>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -73,9 +171,17 @@ if __name__ == &#34;__main__&#34;:
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-functions">Functions</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="dicehand.DiceHand" href="#dicehand.DiceHand">DiceHand</a></code></h4>
 <ul class="">
-<li><code><a title="main.main" href="#main.main">main</a></code></li>
+<li><code><a title="dicehand.DiceHand.getRollAmount" href="#dicehand.DiceHand.getRollAmount">getRollAmount</a></code></li>
+<li><code><a title="dicehand.DiceHand.getRoundPoints" href="#dicehand.DiceHand.getRoundPoints">getRoundPoints</a></code></li>
+<li><code><a title="dicehand.DiceHand.getRoundsplayed" href="#dicehand.DiceHand.getRoundsplayed">getRoundsplayed</a></code></li>
+<li><code><a title="dicehand.DiceHand.updateHand" href="#dicehand.DiceHand.updateHand">updateHand</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
