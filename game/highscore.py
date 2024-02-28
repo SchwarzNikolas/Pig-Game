@@ -1,1 +1,1 @@
-pass
+"""The Module to control Highscores."""
