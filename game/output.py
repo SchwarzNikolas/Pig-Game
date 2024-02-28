@@ -31,31 +31,37 @@ class Output(Cmd):
 
         Arguments:
             -c: create Players  [profile -c John,Jane]
-            -r: rename Player   [profile -r John
-            -d: delete Player   [profile -d John
+            -r: rename Player   [profile -r John]
+            -d: delete Player   [profile -d John]
         """
         args = args.split()
         if not args:
             print("No arguments given!")
             return
-        match args[0]:
-            case "-c":
-                try:
-                    self.game.create_player(args[1].split(","))
-                except IndexError:
-                    print("No playernames provided!")
-            case "-r":
-                try:
-                    if self.game.rename_player(args[1]):
+
+        try:
+            playername = args[1]
+        except IndexError:
+            if args[0] in ["-d", "-r", "-c"]:
+                print("No playername provided!")
+            else:
+                print("Garbage argument. Use \"help profile\".")
+        else:
+            match args[0]:
+                case "-c":
+                    self.game.create_player(playername.split(","))
+                case "-r":
+                    if self.game.rename_player(playername):
                         print("Playername sucessfully changed!")
                     else:
-                        print(f"Player {args[1]} doesn't exist.")
-                except IndexError:
-                    print("No playername provided!")
-            case "d":
-                pass
-            case _:
-                print("Garbage argument. Use help profile to list  agruments.")
+                        print(f"Player {playername} doesn't exist.")
+                case "-d":
+                    if self.game.delete_player(playername):
+                        print(f"Player {playername} has been deleted.")
+                    else:
+                        print(f"Player {playername} doesn't exist.")
+                case _:
+                    print("Garbage argument. Use \"help profile\".")
 
     def do_start(self, args):
         """
