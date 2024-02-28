@@ -1,1 +1,1 @@
-"""Make folder visible"""
+"""Make folder visible."""
