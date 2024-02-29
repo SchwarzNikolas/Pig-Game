@@ -1,4 +1,5 @@
 """The Module to control Highscores."""
 
 
-pass
+class Highscore:
+    pass
