@@ -3,13 +3,11 @@
 
 class Histogram:
     """Blueprint for a Histogram."""
-    
+
     def barchart(self):
         number = 10
         player_name = "isaac"
-        print(f"{player_name} | 
-        
-              {'∎' * number}{number}") 
+        print(f"{player_name} {'∎' * number}{number}")
 
 
 histogram = Histogram()

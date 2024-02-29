@@ -29,8 +29,7 @@ class Player:
     def roll_dice(self):
         """Decides Fate."""
         dice = Dice()
-        roll_number = dice.roll()
+        # roll_number = dice.roll()
 
     def return_stats(self):
         """Museum of your previous games."""
-

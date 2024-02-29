@@ -11,3 +11,18 @@ class TestPlayerClass(unittest.TestCase):
             res = Player()
             exp = Player
             self.assertIsInstance(res, exp)
+
+        def test_reset_player_stats(self):
+            """Test if the Player's statistics are reset"""
+            pass
+        
+        def test_change_name(self):
+            """Test if the Player's name changed"""
+            pass
+
+        def test_roll_dice(self):
+            pass
+
+        def test_return_stats(self):
+            """Test if statistics are shown"""
+            pass

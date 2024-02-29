@@ -2,4 +2,6 @@
 
 
 class Highscore:
+    """The Blueprint for Highscores."""
+
     pass
