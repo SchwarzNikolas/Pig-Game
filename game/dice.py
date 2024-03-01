@@ -9,7 +9,7 @@ class Dice:
 
     def __init__(self):
         """Initialize object."""
-        self.num = 0
+        random.seed()
 
     def roll(self):
         """Roll the dice and return the result."""
