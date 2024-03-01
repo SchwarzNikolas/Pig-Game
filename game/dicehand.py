@@ -16,12 +16,10 @@ class DiceHand:
         if diceroll != 1:
             self.roundpoints += diceroll
             self.amountOfRolls += 1
-            return True
         else:
             self.amountOfRolls += 1
             self.roundpoints = 0
             self.rounds += 1
-            return False
 
     def hold(self):
         """End round."""
