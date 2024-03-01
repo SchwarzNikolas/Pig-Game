@@ -9,7 +9,7 @@ class TestPlayerClass(unittest.TestCase):
 
     def test_init_default_object(self):
         """Instantiate an object and check its properties."""
-        res = Player()
+        res = Player("Test")
         exp = Player
         self.assertIsInstance(res, exp)
 

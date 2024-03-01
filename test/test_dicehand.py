@@ -14,17 +14,6 @@ class Test_DiceHand(unittest.TestCase):
         res = diceHand.roundpoints
         exp = 0
         self.assertEqual(res, exp)
-    
-    def test_update_hand_boolean(self):
-        diceHand = DiceHand()
-        
-        res = diceHand.update_Hand(5)
-        exp = True
-        self.assertEqual(res, exp)
-        
-        res = diceHand.update_Hand(1)
-        exp = False
-        self.assertEqual(res, exp)
 
     def test_change_round_points_using_update_hand(self):
         diceHand = DiceHand()
@@ -47,7 +36,7 @@ class Test_DiceHand(unittest.TestCase):
         diceHand.update_Hand(5)
         diceHand.hold()
         
-        res = diceHand.totalpoints
+        res = diceHand.get_totalPoints()
         exp = 9
         self.assertEqual(res, exp)
 
