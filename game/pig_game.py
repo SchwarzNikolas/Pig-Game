@@ -1,8 +1,7 @@
 """Module with the game logic."""
 
 import pickle
-from player import Player
-from dice import Dice
+from game.player import Player
 
 
 class Game:
@@ -19,11 +18,10 @@ class Game:
         self.active_players = []
         self.game_state = -1
         self.amount_players = 0
-        self.dice = Dice()
 
     def start(self, args):
         """Start a new game."""
-        player_names = args.split()
+        player_names = args.split(",")
         if len(player_names) > 6 or len(player_names) < 1:
             raise ValueError("The amount of players must be between 1 and 6.")
         self.amount_players = len(player_names)
@@ -33,6 +31,7 @@ class Game:
             for player in self.players:
                 if player.player_name == name:
                     player_exists = True
+                    player.dice_holder.reset()
                     self.active_players.append(player)
                     break
             if not player_exists:
@@ -75,14 +74,36 @@ class Game:
 
     def roll(self):
         """Player decides to roll the dice."""
+        msg = "No active game!"
         if self.game_state < 0:
-            return "No active game!"
-        dice = Dice()
-        dice_num = dice.roll()
-        if dice_num == 1:
-            return f"{self.players[self.game_state].name}\
-has rolled a 1 and lost all points this round."
-        return f"{self.players[self.game_state].name} has rolled a {dice_num}."
+            return msg
+        roll = self.active_players[self.game_state].roll_dice()
+        if roll == 1:
+            self.game_state = (self.game_state + 1) % len(self.active_players)
+            player = self.active_players[self.game_state - 1]
+            name = f"{player.player_name}"
+            string = " has rolled a 1 and lost all points this round."
+            score = f"\nTotal score: {player.dice_holder.get_totalPoints()}"
+            points = f"\nRound score: {player.dice_holder.get_roundPoints()}"
+            return name + string + points + score
+        player = self.active_players[self.game_state]
+        name = f"{player.player_name}"
+        string = f" has rolled a {roll}"
+        points = f"\nRound score: {player.dice_holder.get_roundPoints()}"
+        score = f"\nTotal score: {player.dice_holder.get_totalPoints()}"
+        return name + string + points + score
+
+    def hold(self):
+        """Player decides to roll the dice."""
+        msg = "No active game!"
+        if self.game_state < 0:
+            return msg
+        player = self.active_players[self.game_state]
+        player.dice_holder.hold()
+        self.game_state = (self.game_state + 1) % len(self.active_players)
+        name = f"{player.player_name}'s total points are now: "
+        score = f"{player.dice_holder.get_totalPoints()}"
+        return name + score
 
     def exit(self):
         """Save players and exit"""

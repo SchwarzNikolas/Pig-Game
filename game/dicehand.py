@@ -27,6 +27,12 @@ class DiceHand:
         self.roundpoints = 0
         self.rounds += 1
 
+    def reset(self):
+        self.roundpoints = 0
+        self.rounds = 0
+        self.amountOfRolls = 0
+        self.totalpoints = 0
+
     def get_amountOfRolls(self):
         """Get amount of rolls."""
         return self.amountOfRolls
@@ -38,3 +44,7 @@ class DiceHand:
     def get_totalPoints(self):
         """Get total points."""
         return self.totalpoints
+
+    def get_roundPoints(self):
+        """Get points of current round."""
+        return self.roundpoints

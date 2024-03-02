@@ -65,7 +65,7 @@ class Output(Cmd):
 
     def do_start(self, args):
         """
-        Start a new game. Usage: "start John Jane".
+        Start a new game. Usage: "start John,Jane".
 
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
@@ -84,9 +84,20 @@ class Output(Cmd):
 
     def do_roll(self, _):
         """Roll the dice."""
-        Cmd.prompt = "(Player 1) "
         msg = self.game.roll()
         print(msg)
+
+    def do_hold(self, _):
+        """Keep the round points."""
+        msg = self.game.hold()
+        print(msg)
+
+    def postcmd(self, stop, line):
+        if stop is True or "exit" in line:
+            return True
+        if self.game.game_state >= 0:
+            Cmd.prompt = f"({self.game.active_players[self.game.game_state].player_name}) "
+        return False
 
     def do_exit(self, _):
         """Exit the game."""
