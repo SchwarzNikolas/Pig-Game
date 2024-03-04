@@ -31,6 +31,7 @@ class BinaryBrain:
                     roll = self.roll_dice()
                     if roll == 1:
                         print("\nBinaryBrain has rolled a one and has lost all its round points.")
+                        return
                     else:
                         print(f"BinaryBrain has rolled a {roll}.")
                         points = f"Round score: {self.dice_holder.get_roundPoints()}"
@@ -39,5 +40,5 @@ class BinaryBrain:
                 else:
                     self.dice_holder.hold()
                     print("\nBinaryBrain has kept its points.")
-                    print(f"Its total score is now: {self.dice_holder.get_totalPoints()}\n")
+                    print("Its total score is now: {self.dice_holder.get_totalPoints}")
                     return
