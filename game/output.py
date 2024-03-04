@@ -2,6 +2,7 @@
 
 from cmd import Cmd
 from game.pig_game import Game
+from game.intelligence import BinaryBrain
 
 
 class Output(Cmd):
@@ -89,18 +90,26 @@ class Output(Cmd):
         msg = self.game.roll()
         print(msg)
 
+    def do_AI(self, args):
+        """Enable/Disable AI. Usage: "AI True / AI False."""
+        self.game.set_AI(args)
+
     def do_hold(self, _):
         """Keep the round points."""
         msg = self.game.hold()
         print(msg)
 
     def postcmd(self, stop, line):
-        """Set correct playername after each action."""
+        """Set correct player after each action."""
+        index = self.game.game_state
         if stop is True or "exit" in line:
             return True
-        if self.game.game_state >= 0:
+        if index >= 0:
+            if isinstance(self.game.active_players[index], BinaryBrain):
+                self.game.play_AI()
+                return
             players = self.game.active_players
-            Cmd.prompt = f"({players[self.game.game_state].player_name}) "
+            Cmd.prompt = f"({players[index].player_name}) "
         return False
 
     def do_exit(self, _):
