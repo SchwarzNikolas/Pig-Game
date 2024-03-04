@@ -90,7 +90,7 @@ class Game:
             self.game_state = (self.game_state + 1) % self.amount_players
             player = self.active_players[self.game_state - 1]
             name = f"\n{player.player_name}"
-            string = " has rolled a 1 and lost all points this round."
+            string = " has rolled a 1 and lost all points this round.\n"
             score = f"\nTotal score: {player.dice_holder.get_totalPoints()}"
             points = f"\nRound score: {player.dice_holder.get_roundPoints()}"
             return name + string + points + score
@@ -125,7 +125,6 @@ class Game:
     def play_AI(self):
         self.ai.evaluate_round()
         self.game_state = (self.game_state + 1) % self.amount_players
-
 
     def exit(self):
         """Save players and exit."""

@@ -40,5 +40,5 @@ class BinaryBrain:
                 else:
                     self.dice_holder.hold()
                     print("\nBinaryBrain has kept its points.")
-                    print("Its total score is now: {self.dice_holder.get_totalPoints}")
+                    print(f"Its total score is now: {self.dice_holder.get_totalPoints()}")
                     return

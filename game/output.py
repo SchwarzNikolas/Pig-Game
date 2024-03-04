@@ -107,7 +107,7 @@ class Output(Cmd):
         if index >= 0:
             if isinstance(self.game.active_players[index], BinaryBrain):
                 self.game.play_AI()
-                return
+                index = self.game.game_state
             players = self.game.active_players
             Cmd.prompt = f"({players[index].player_name}) "
         return False
