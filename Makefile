@@ -38,7 +38,11 @@ install:
 installed:
 	$(PYTHON) -m pip list
 
-
+# ---------------------------------------------------------
+# Start the game.
+#
+start:
+	PYTHONPATH="." $(PYTHON) game/main.py
 # ---------------------------------------------------------
 # Cleanup generated and installed files.
 #
