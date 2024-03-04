@@ -30,16 +30,18 @@ class Output(Cmd):
         Player profile settings.
 
         Arguments:
-            -c: create Players  [profile -c John,Jane]
+            -c: create Players  [profile -c John, Jane]
             -r: rename Player   [profile -r John]
             -d: delete Player   [profile -d John]
         """
         args = args.split()
+        args = [item.strip().strip(",") for item in args]
         if not args:
             print("No arguments given!")
             return
 
         try:
+            playernames = args[1::]
             playername = args[1]
         except IndexError:
             if args[0] in ["-d", "-r", "-c"]:
@@ -49,7 +51,7 @@ class Output(Cmd):
         else:
             match args[0]:
                 case "-c":
-                    self.game.create_player(playername.split(","))
+                    self.game.create_player(playernames)
                 case "-r":
                     if self.game.rename_player(playername):
                         print("Playername sucessfully changed!")
@@ -65,7 +67,7 @@ class Output(Cmd):
 
     def do_start(self, args):
         """
-        Start a new game. Usage: "start John,Jane".
+        Start a new game. Usage: "start John, Jane".
 
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
@@ -93,10 +95,12 @@ class Output(Cmd):
         print(msg)
 
     def postcmd(self, stop, line):
+        """Set correct playername after each action."""
         if stop is True or "exit" in line:
             return True
         if self.game.game_state >= 0:
-            Cmd.prompt = f"({self.game.active_players[self.game.game_state].player_name}) "
+            players = self.game.active_players
+            Cmd.prompt = f"({players[self.game.game_state].player_name}) "
         return False
 
     def do_exit(self, _):

@@ -56,6 +56,7 @@ class Game:
                 print(f"Player {name} has been created!")
 
     def rename_player(self, name):
+        """Rename player's object."""
         for player in self.players:
             if player.player_name == name:
                 player.change_name()
@@ -63,6 +64,7 @@ class Game:
         return False
 
     def delete_player(self, name):
+        """Delete player from list."""
         for player in self.players:
             if player.player_name == name:
                 confirm = input(f"Proceed with deleting Player {name}? [y/N] ")
@@ -109,7 +111,7 @@ class Game:
         return name + score
 
     def exit(self):
-        """Save players and exit"""
+        """Save players and exit."""
         with open("players.dat", "wb") as file:
             pickle.dump(self.players, file)
         return "Thank you for playing!"

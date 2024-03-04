@@ -43,6 +43,7 @@ installed:
 #
 start:
 	PYTHONPATH="." $(PYTHON) game/main.py
+
 # ---------------------------------------------------------
 # Cleanup generated and installed files.
 #
