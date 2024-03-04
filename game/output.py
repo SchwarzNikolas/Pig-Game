@@ -1,7 +1,7 @@
 """Module with commands for the player."""
 
 from cmd import Cmd
-from pig_game import Game
+from game.pig_game import Game
 
 
 class Output(Cmd):

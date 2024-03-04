@@ -1,6 +1,6 @@
 """File to start the Pig-Game."""
 
-from output import Output
+from game.output import Output
 
 
 def main():

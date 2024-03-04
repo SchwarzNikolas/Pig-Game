@@ -29,13 +29,13 @@ class Game:
         for name in player_names:
             player_exists = False
             for player in self.players:
-                if player.player_name == name:
+                if player.player_name == name.strip():
                     player_exists = True
                     player.dice_holder.reset()
                     self.active_players.append(player)
                     break
             if not player_exists:
-                print(f"Player {name} doesnt have a profile yet!")
+                print(f"Player {name.strip()} doesnt have a profile yet!")
                 return False
 
         self.game_state = 0
@@ -100,6 +100,9 @@ class Game:
             return msg
         player = self.active_players[self.game_state]
         player.dice_holder.hold()
+        if player.dice_holder.get_totalPoints() >= 100:
+            self.game_state = -1
+            return f"{player.player_name} has won the game!"
         self.game_state = (self.game_state + 1) % len(self.active_players)
         name = f"{player.player_name}'s total points are now: "
         score = f"{player.dice_holder.get_totalPoints()}"
