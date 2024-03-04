@@ -47,7 +47,7 @@ class Output(Cmd):
             if args[0] in ["-d", "-r", "-c"]:
                 print("No playername provided!")
             else:
-                print("Garbage argument. Use \"help profile\".")
+                print('Garbage argument. Use "help profile".')
         else:
             match args[0]:
                 case "-c":
@@ -63,7 +63,7 @@ class Output(Cmd):
                     else:
                         print(f"Player {playername} doesn't exist.")
                 case _:
-                    print("Garbage argument. Use \"help profile\".")
+                    print('Garbage argument. Use "help profile".')
 
     def do_start(self, args):
         """

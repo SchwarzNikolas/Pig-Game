@@ -1,6 +1,5 @@
 """Representing a dice object for rolling."""
 
-
 import random
 
 
