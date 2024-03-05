@@ -94,9 +94,9 @@ class Output(Cmd):
         msg = self.game.roll()
         print(msg)
 
-    def do_AI(self, args):
+    def do_ai(self, args):
         """Enable/Disable AI. Usage: "AI True / AI False."""
-        self.game.set_AI(args)
+        self.game.set_ai(args)
 
     def do_hold(self, _):
         """Keep the round points."""
@@ -112,12 +112,12 @@ class Output(Cmd):
         self.game.restart()
 
     def do_cheat(self, _):
-        """Helps the player to finish the game faster."""
+        """Help the player to finish the game faster."""
         self.game.cheat()
 
     def do_rules(self, _):
         """Print out the rules of the game."""
-        with open("game/rules.txt") as file:
+        with open("game/rules.txt", "r", -1, "utf-8") as file:
             print(file.read())
 
     def postcmd(self, stop, line):
@@ -127,10 +127,11 @@ class Output(Cmd):
             return True
         if index >= 0:
             if isinstance(self.game.active_players[index], BinaryBrain):
-                self.game.play_AI()
+                self.game.play_ai()
                 index = self.game.game_state
-            players = self.game.active_players
-            Cmd.prompt = f"({players[index].player_name}) "
+            else:
+                players = self.game.active_players
+                Cmd.prompt = f"({players[index].player_name}) "
         else:
             Cmd.prompt = "(pig-game) "
         return False

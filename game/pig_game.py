@@ -31,6 +31,7 @@ class Game:
             raise ValueError("The amount of players must be between 1 and 6.")
 
         self.active_players = []
+        self.ai.dice_holder.reset()
         for name in player_names:
             player_exists = False
             for player in self.players:
@@ -119,7 +120,7 @@ class Game:
         score = f"{player.dice_holder.get_totalPoints()}\n"
         return name + score
 
-    def set_AI(self, state):
+    def set_ai(self, state):
         """Enable the AI."""
         state = state.lower()
         if state == "true":
@@ -129,9 +130,15 @@ class Game:
             self.active_ai = 0
             print("AI is disabled for the next game!")
 
-    def play_AI(self):
+    def play_ai(self):
         """Let the AI do its moves."""
         self.ai.evaluate_round()
+        player = self.ai
+        if player.dice_holder.get_totalPoints() >= 100:
+            self.game_state = -1
+            print(f"{player.player_name} has won the game!")
+            print("Press enter to quit the current game.")
+            return
         self.game_state = (self.game_state + 1) % self.amount_players
 
     def quit(self):
@@ -143,7 +150,7 @@ class Game:
             print("No active game!")
 
     def cheat(self):
-        """Sets the current players points to 99"""
+        """Set the current players points to 99."""
         self.cheated_game = 1
         self.active_players[self.game_state].dice_holder.totalpoints = 99
         print("You cheated!\nYour total points are set to 99.")
