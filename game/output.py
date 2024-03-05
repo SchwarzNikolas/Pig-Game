@@ -41,6 +41,10 @@ class Output(Cmd):
             print("No arguments given!")
             return
 
+        if self.game.game_state > 0:
+            print("Can't modify profiles during an active game!")
+            return
+
         try:
             playernames = args[1::]
             playername = args[1]
@@ -106,6 +110,15 @@ class Output(Cmd):
     def do_restart(self, _):
         """Restart a quit game."""
         self.game.restart()
+
+    def do_cheat(self, _):
+        """Helps the player to finish the game faster."""
+        self.game.cheat()
+
+    def do_rules(self, _):
+        """Print out the rules of the game."""
+        with open("game/rules.txt") as file:
+            print(file.read())
 
     def postcmd(self, stop, line):
         """Set correct player after each action."""

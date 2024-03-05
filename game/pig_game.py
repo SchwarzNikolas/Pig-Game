@@ -22,6 +22,7 @@ class Game:
         self.ai = BinaryBrain()
         self.active_ai = 0
         self.save_game = 0
+        self.cheated_game = 0
 
     def start(self, args):
         """Start a new game."""
@@ -51,20 +52,17 @@ class Game:
 
     def create_player(self, names):
         """Create players with a list of names."""
-        if self.game_state < 0:
-            for name in names:
-                taken = 0
-                if len(self.players) > 0:
-                    for existing_player in self.players:
-                        if name == existing_player.player_name:
-                            print(f"Playername {name} is already taken!")
-                            taken = 1
-                            break
-                if not taken:
-                    self.players.append(Player(name))
-                    print(f"Player {name} has been created!")
-        else:
-            print("Can't modify profiles during an active game!")
+        for name in names:
+            taken = 0
+            if len(self.players) > 0:
+                for existing_player in self.players:
+                    if name == existing_player.player_name:
+                        print(f"Playername {name} is already taken!")
+                        taken = 1
+                        break
+            if not taken:
+                self.players.append(Player(name))
+                print(f"Player {name} has been created!")
 
     def rename_player(self, name):
         """Rename player's object."""
@@ -123,10 +121,13 @@ class Game:
 
     def set_AI(self, state):
         """Enable the AI."""
-        if state == "True":
+        state = state.lower()
+        if state == "true":
             self.active_ai = 1
+            print("AI will join the next game!")
         else:
             self.active_ai = 0
+            print("AI is disabled for the next game!")
 
     def play_AI(self):
         """Let the AI do its moves."""
@@ -135,12 +136,17 @@ class Game:
 
     def quit(self):
         """Pause/Quit current game."""
-        print(self.game_state)
         if self.game_state >= 0:
             self.save_game = self.game_state
             self.game_state = -1
         else:
             print("No active game!")
+
+    def cheat(self):
+        """Sets the current players points to 99"""
+        self.cheated_game = 1
+        self.active_players[self.game_state].dice_holder.totalpoints = 99
+        print("You cheated!\nYour total points are set to 99.")
 
     def restart(self):
         """Restart paused game."""
