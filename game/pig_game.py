@@ -21,6 +21,7 @@ class Game:
         self.amount_players = 0
         self.ai = BinaryBrain()
         self.active_ai = 0
+        self.save_game = 0
 
     def start(self, args):
         """Start a new game."""
@@ -28,6 +29,7 @@ class Game:
         if len(player_names) > 6 or len(player_names) < 1:
             raise ValueError("The amount of players must be between 1 and 6.")
 
+        self.active_players = []
         for name in player_names:
             player_exists = False
             for player in self.players:
@@ -49,17 +51,20 @@ class Game:
 
     def create_player(self, names):
         """Create players with a list of names."""
-        for name in names:
-            taken = 0
-            if len(self.players) > 0:
-                for existing_player in self.players:
-                    if name == existing_player.player_name:
-                        print(f"Playername {name} is already taken!")
-                        taken = 1
-                        break
-            if not taken:
-                self.players.append(Player(name))
-                print(f"Player {name} has been created!")
+        if self.game_state < 0:
+            for name in names:
+                taken = 0
+                if len(self.players) > 0:
+                    for existing_player in self.players:
+                        if name == existing_player.player_name:
+                            print(f"Playername {name} is already taken!")
+                            taken = 1
+                            break
+                if not taken:
+                    self.players.append(Player(name))
+                    print(f"Player {name} has been created!")
+        else:
+            print("Can't modify profiles during an active game!")
 
     def rename_player(self, name):
         """Rename player's object."""
@@ -117,14 +122,32 @@ class Game:
         return name + score
 
     def set_AI(self, state):
+        """Enable the AI."""
         if state == "True":
             self.active_ai = 1
         else:
             self.active_ai = 0
 
     def play_AI(self):
+        """Let the AI do its moves."""
         self.ai.evaluate_round()
         self.game_state = (self.game_state + 1) % self.amount_players
+
+    def quit(self):
+        """Pause/Quit current game."""
+        print(self.game_state)
+        if self.game_state >= 0:
+            self.save_game = self.game_state
+            self.game_state = -1
+        else:
+            print("No active game!")
+
+    def restart(self):
+        """Restart paused game."""
+        if self.save_game > 0:
+            self.game_state = self.save_game
+        else:
+            print("There is no paused game!")
 
     def exit(self):
         """Save players and exit."""

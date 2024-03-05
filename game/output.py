@@ -99,6 +99,14 @@ class Output(Cmd):
         msg = self.game.hold()
         print(msg)
 
+    def do_quit(self, _):
+        """Quit the current game."""
+        self.game.quit()
+
+    def do_restart(self, _):
+        """Restart a quit game."""
+        self.game.restart()
+
     def postcmd(self, stop, line):
         """Set correct player after each action."""
         index = self.game.game_state
@@ -110,6 +118,8 @@ class Output(Cmd):
                 index = self.game.game_state
             players = self.game.active_players
             Cmd.prompt = f"({players[index].player_name}) "
+        else:
+            Cmd.prompt = "(pig-game) "
         return False
 
     def do_exit(self, _):
