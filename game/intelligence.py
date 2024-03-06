@@ -121,7 +121,7 @@ class BinaryBrain:
         If the AI rolls a one or holds it will return False,
         so that the playing loop stops.
         """
-        if self.dice_holder.get_round_points() < 15:
+        if self.dice_holder.get_round_points() < 20:
             return self.roll()
         self.hold()
         return False
@@ -138,7 +138,8 @@ class BinaryBrain:
         playing loop stops.
         """
         if self.dice_holder.get_total_points() > 70:
-            if self.dice_holder.get_round_points() >= 29:
+            points_to_win = 100 - self.dice_holder.get_total_points()
+            if self.dice_holder.get_round_points() >= points_to_win:
                 self.hold()
                 return False
             return self.roll()

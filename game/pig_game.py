@@ -6,10 +6,25 @@ from game.intelligence import BinaryBrain
 
 
 class Game:
-    """Pig-Game Class."""
+    """
+    Pig-Game Class.
+
+    This class holds the game logic.
+    It holds the playerdata aswell as the AI.
+    """
 
     def __init__(self):
-        """Initialize Object."""
+        """
+        Initialize Object.
+
+        self.players holds all the saved players with their stats.
+        self.active_players holds all the players of an active game.
+        self.gamestate indicates if a game is active and whoes turn it is.
+        self.amount_players stores the amount of active players in a round.
+        self.ai is the object of the pig-game AI.
+        self.saved_game saves the state of an ongoing game if the user quits.
+        self.cheated_game indicates if someone used the cheat command.
+        """
         self.players = []
         try:
             with open("players.dat", "rb") as file:
@@ -25,10 +40,21 @@ class Game:
         self.cheated_game = 0
 
     def start(self, args):
-        """Start a new game."""
+        """
+        Start a new game.
+
+        Checks how many players will join the game,
+        will enable AI if only 1 player joins.
+        After the amount of players is checked all provided players
+        will be moved into the active player list.
+        If everything is sucessfull the gamestate will be set to 0.
+        """
         player_names = args.split(",")
         if len(player_names) > 6 or len(player_names) < 1:
             raise ValueError("The amount of players must be between 1 and 6.")
+        if len(player_names) == 1:
+            self.active_ai = 1
+            print("AI will join this game!")
 
         self.active_players = []
         self.ai.dice_holder.reset()
@@ -52,7 +78,12 @@ class Game:
         return self.active_players[0]
 
     def create_player(self, names):
-        """Create players with a list of names."""
+        """
+        Create a new player object.
+
+        Loops through a list of player names.
+        Create a new player is the given name isn't taken.
+        """
         for name in names:
             taken = 0
             if len(self.players) > 0:
@@ -74,7 +105,12 @@ class Game:
         return False
 
     def delete_player(self, name):
-        """Delete player from list."""
+        """
+        Delete player from list.
+
+        Delete the player object from the player list if the name matches.
+        Needs confirmation before deleting.
+        """
         for player in self.players:
             if player.player_name == name:
                 confirm = input(f"Proceed with deleting Player {name}? [y/N] ")
@@ -85,7 +121,11 @@ class Game:
         return False
 
     def roll(self):
-        """Player decides to roll the dice."""
+        """
+        Player decides to roll the dice.
+
+        A.
+        """
         msg = "No active game!"
         if self.game_state < 0:
             return msg
@@ -95,14 +135,14 @@ class Game:
             player = self.active_players[self.game_state - 1]
             name = f"\n{player.player_name}"
             string = " has rolled a 1 and lost all points this round.\n"
-            score = f"\nTotal score: {player.dice_holder.get_totalPoints()}"
-            points = f"\nRound score: {player.dice_holder.get_roundPoints()}"
+            score = f"\nTotal score: {player.dice_holder.get_total_points()}"
+            points = f"\nRound score: {player.dice_holder.get_round_points()}"
             return name + string + points + score
         player = self.active_players[self.game_state]
         name = f"\n{player.player_name}"
         string = f" has rolled a {roll}"
-        points = f"\nRound score: {player.dice_holder.get_roundPoints()}"
-        score = f"\nTotal score: {player.dice_holder.get_totalPoints()}\n"
+        points = f"\nRound score: {player.dice_holder.get_round_points()}"
+        score = f"\nTotal score: {player.dice_holder.get_total_points()}\n"
         return name + string + points + score
 
     def hold(self):
@@ -112,19 +152,20 @@ class Game:
             return msg
         player = self.active_players[self.game_state]
         player.dice_holder.hold()
-        if player.dice_holder.get_totalPoints() >= 100:
+        if player.dice_holder.get_total_points() >= 100:
             self.game_state = -1
+            self.active_ai = 0
             return f"{player.player_name} has won the game!"
         self.game_state = (self.game_state + 1) % self.amount_players
         name = f"\n{player.player_name}'s total points are now: "
-        score = f"{player.dice_holder.get_totalPoints()}\n"
+        score = f"{player.dice_holder.get_total_points()}\n"
         return name + score
 
-    def set_ai(self, state):
+    def set_ai(self, state, difficulty):
         """Enable the AI."""
-        state = state.lower()
         if state == "true":
             self.active_ai = 1
+            self.ai.update_difficulty(difficulty)
             print("AI will join the next game!")
         else:
             self.active_ai = 0
@@ -134,10 +175,11 @@ class Game:
         """Let the AI do its moves."""
         self.ai.evaluate_round()
         player = self.ai
-        if player.dice_holder.get_totalPoints() >= 100:
+        if player.dice_holder.get_total_points() >= 100:
             self.game_state = -1
             print(f"{player.player_name} has won the game!")
-            print("Press enter to quit the current game.")
+            print("Type quit to leave the current game.")
+            self.active_ai = 0
             return
         self.game_state = (self.game_state + 1) % self.amount_players
 
@@ -146,8 +188,6 @@ class Game:
         if self.game_state >= 0:
             self.save_game = self.game_state
             self.game_state = -1
-        else:
-            print("No active game!")
 
     def cheat(self):
         """Set the current players points to 99."""
@@ -163,7 +203,12 @@ class Game:
             print("There is no paused game!")
 
     def exit(self):
-        """Save players and exit."""
+        """
+        Save players and exit.
+
+        Method will be called when the user exits the program,
+        The playerlist will be saved as a binary file.
+        """
         with open("players.dat", "wb") as file:
             pickle.dump(self.players, file)
         return "Thank you for playing!"
