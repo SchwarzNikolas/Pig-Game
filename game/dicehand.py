@@ -8,16 +8,16 @@ class DiceHand:
         """Initialize self."""
         self.roundpoints = 0
         self.rounds = 0
-        self.amountOfRolls = 0
+        self.amountofrolls = 0
         self.totalpoints = 0
 
-    def update_Hand(self, diceroll):
+    def update_hand(self, diceroll):
         """Update values of object."""
         if diceroll != 1:
             self.roundpoints += diceroll
-            self.amountOfRolls += 1
+            self.amountofrolls += 1
         else:
-            self.amountOfRolls += 1
+            self.amountofrolls += 1
             self.roundpoints = 0
             self.rounds += 1
 
@@ -28,23 +28,24 @@ class DiceHand:
         self.rounds += 1
 
     def reset(self):
+        """Reset values."""
         self.roundpoints = 0
         self.rounds = 0
-        self.amountOfRolls = 0
+        self.amountofrolls = 0
         self.totalpoints = 0
 
-    def get_amountOfRolls(self):
+    def get_amount_of_rolls(self):
         """Get amount of rolls."""
-        return self.amountOfRolls
+        return self.amountofrolls
 
     def get_rounds(self):
         """Get rounds."""
         return self.rounds
 
-    def get_totalPoints(self):
+    def get_total_points(self):
         """Get total points."""
         return self.totalpoints
 
-    def get_roundPoints(self):
+    def get_round_points(self):
         """Get points of current round."""
         return self.roundpoints
