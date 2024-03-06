@@ -95,8 +95,37 @@ class Output(Cmd):
         print(msg)
 
     def do_ai(self, args):
-        """Enable/Disable AI. Usage: "AI True / AI False."""
-        self.game.set_ai(args)
+        """
+        Enable/Disable AI. Usage: "ai true -medium / ai false.
+
+        After the ai keyword provide true or false to enable / disable the ai.
+        If the ai should be enabled,
+        set the difficulty level with the following arguments:
+        -e: easy AI     [ai true -e]
+        -m: medium AI   [ai true -m]
+        -h: hard AI     [ai true -h]
+        """
+        if not args:
+            print("No arguments given!")
+            return
+
+        args = args.lower()
+        args = args.split()
+        try:
+            state = args[0]
+            difficulty = args[1]
+        except IndexError:
+            print('Garbage argument. Use "help ai".')
+        else:
+            match difficulty:
+                case "-e":
+                    self.game.set_ai(state, 0)
+                case "-m":
+                    self.game.set_ai(state, 1)
+                case "-h":
+                    self.game.set_ai(state, 2)
+                case _:
+                    print('Garbage argument. Use "help ai".')
 
     def do_hold(self, _):
         """Keep the round points."""
@@ -129,8 +158,8 @@ class Output(Cmd):
             if isinstance(self.game.active_players[index], BinaryBrain):
                 self.game.play_ai()
                 index = self.game.game_state
-            else:
-                players = self.game.active_players
+            players = self.game.active_players
+            if players[self.game.game_state].player_name != "BinaryBrain":
                 Cmd.prompt = f"({players[index].player_name}) "
         else:
             Cmd.prompt = "(pig-game) "

@@ -38,7 +38,7 @@ class BinaryBrain:
         """
         dice = Dice()
         roll_number = dice.roll()
-        self.dice_holder.update_Hand(roll_number)
+        self.dice_holder.update_hand(roll_number)
         return roll_number
 
     def update_difficulty(self, difficulty):
@@ -62,6 +62,41 @@ class BinaryBrain:
             match self.difficulty:
                 case 0:
                     keep_going = self.easy()
+                case 1:
+                    keep_going = self.medium()
+                case 2:
+                    keep_going = self.hard()
+
+    def roll(self):
+        """
+        Roll the dice and evaluate result.
+
+        Rolls the dice, evaluates and prints out result.
+        """
+        roll = self.roll_dice()
+        round_points = self.dice_holder.get_round_points()
+        total_points = self.dice_holder.get_total_points()
+        if roll == 1:
+            print("BinaryBrain has rolled a 1 and lost its round points.")
+            print(f"\nTotal score: {total_points}\n")
+            return False
+        print(f"BinaryBrain has rolled a {roll}.")
+        points = f"Round score: {round_points}"
+        score = f"\nTotal score: {total_points}\n"
+        print(points + score)
+        return True
+
+    def hold(self):
+        """
+        Hold the round points.
+
+        AI decides to transver the round points to its total points.
+        Print out the results afterwards.
+        """
+        self.dice_holder.hold()
+        total_points = self.dice_holder.get_total_points()
+        print("\nBinaryBrain has kept its points.")
+        print(f"Its total score is now: {total_points}")
 
     def easy(self):
         """
@@ -72,21 +107,47 @@ class BinaryBrain:
         If the AI rolls a one or holds it will return False,
         so that the playing loop stops.
         """
-        if self.dice_holder.get_roundPoints() < 15:
-            roll = self.roll_dice()
-            round_points = self.dice_holder.get_roundPoints()
-            total_points = self.dice_holder.get_totalPoints()
-            if roll == 1:
-                print("BinaryBrain has rolled a 1 and lost its round points.")
-                print(f"\nTotal score: {total_points}\n")
+        if self.dice_holder.get_round_points() < 15:
+            return self.roll()
+        self.hold()
+        return False
+
+    def medium(self):
+        """
+        Medium difficulty level of the AI.
+
+        The AI will always roll until it has 20 round points.
+        After it reaches 20 points it will hold.
+        If the AI rolls a one or holds it will return False,
+        so that the playing loop stops.
+        """
+        if self.dice_holder.get_round_points() < 20:
+            return self.roll()
+        self.hold()
+        return False
+
+    def hard(self):
+        """
+        Hard difficulty level of the AI.
+
+        AI will always roll until it has 20 points,
+        between 20 and 25 points it will randomly decide if it wants
+        to hold or to continue playing.
+        If the AI has 70 total points it will roll until it wins.
+        If the AI rolls a one or holds it will return False, so that the
+        playing loop stops.
+        """
+        if self.dice_holder.get_total_points() > 70:
+            points_to_win = 100 - self.dice_holder.get_total_points()
+            if self.dice_holder.get_round_points() >= points_to_win:
+                self.hold()
                 return False
-            print(f"BinaryBrain has rolled a {roll}.")
-            points = f"Round score: {round_points}"
-            score = f"\nTotal score: {total_points}\n"
-            print(points + score)
-            return True
-        self.dice_holder.hold()
-        total_points = self.dice_holder.get_totalPoints()
-        print("\nBinaryBrain has kept its points.")
-        print(f"Its total score is now: {total_points}")
+            return self.roll()
+        if self.dice_holder.get_round_points() < 20:
+            return self.roll()
+        if self.dice_holder.get_round_points() < 26:
+            decision = random.randint(0, 1)
+            if decision == 1:
+                return self.roll()
+        self.hold()
         return False
