@@ -19,13 +19,13 @@ class Test_DiceHand(unittest.TestCase):
     def test_change_round_points_using_update_hand(self):
         diceHand = DiceHand()
 
-        diceHand.update_Hand(6)
+        diceHand.update_hand(6)
 
         res = diceHand.roundpoints
         exp = 6
         self.assertEqual(res, exp)
 
-        diceHand.update_Hand(1)
+        diceHand.update_hand(1)
         res = diceHand.roundpoints
         exp = 0
         self.assertEqual(res, exp)
@@ -33,33 +33,33 @@ class Test_DiceHand(unittest.TestCase):
     def test_hold_and_totalpoints(self):
         diceHand = DiceHand()
 
-        diceHand.update_Hand(4)
-        diceHand.update_Hand(5)
+        diceHand.update_hand(4)
+        diceHand.update_hand(5)
         diceHand.hold()
 
-        res = diceHand.get_totalPoints()
+        res = diceHand.get_total_points()
         exp = 9
         self.assertEqual(res, exp)
 
     def test_amount_of_rolls(self):
         dicehand = DiceHand()
 
-        dicehand.update_Hand(4)
-        dicehand.update_Hand(4)
-        dicehand.update_Hand(4)
-        dicehand.update_Hand(4)
-        dicehand.update_Hand(4)
+        dicehand.update_hand(4)
+        dicehand.update_hand(4)
+        dicehand.update_hand(4)
+        dicehand.update_hand(4)
+        dicehand.update_hand(4)
 
-        res = dicehand.get_amountOfRolls()
+        res = dicehand.get_amount_of_rolls()
         exp = 5
         self.assertEqual(res, exp)
 
     def test_rounds(self):
         dicehand = DiceHand()
 
-        dicehand.update_Hand(1)
-        dicehand.update_Hand(4)
-        dicehand.update_Hand(1)
+        dicehand.update_hand(1)
+        dicehand.update_hand(4)
+        dicehand.update_hand(1)
 
         res = dicehand.get_rounds()
         exp = 2

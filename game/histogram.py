@@ -5,6 +5,7 @@ class Histogram:
     """Blueprint for a Histogram."""
 
     def barchart(self):
+        """Bar."""
         number = 10
         player_name = "isaac"
         print(f"{player_name} {'∎' * number}{number}")
