@@ -30,7 +30,7 @@ class Player:
         """Decides fate."""
         dice = Dice()
         roll_number = dice.roll()
-        self.dice_holder.update_Hand(roll_number)
+        self.dice_holder.update_hand(roll_number)
         return roll_number
 
     def return_stats(self):
