@@ -90,7 +90,7 @@ class Output(Cmd):
             print(err)
 
     def do_roll(self, _):
-        """Roll the dice."""
+        """Roll the dice for the current player."""
         msg = self.game.roll()
         print(msg)
 
@@ -150,7 +150,14 @@ class Output(Cmd):
             print(file.read())
 
     def postcmd(self, stop, line):
-        """Set correct player after each action."""
+        """
+        Set correct player after each action.
+
+        If the exit command is called the game will be closed.
+        Otherwise if a real player has entered a command it will display
+        the name of the next player.
+        If no game is active the default prompt will be displayed.
+        """
         index = self.game.game_state
         if stop is True or "exit" in line:
             return True

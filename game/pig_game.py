@@ -124,7 +124,12 @@ class Game:
         """
         Player decides to roll the dice.
 
-        A.
+        Select the active player and use the roll_dice method.
+        The player returns the result of the roll.
+        If a 1 is rolled, the active player will change and then
+        the round score will be printed.
+        If something else is rolled, the stats will be printed
+        and the player may continue to roll.
         """
         msg = "No active game!"
         if self.game_state < 0:
@@ -146,7 +151,14 @@ class Game:
         return name + string + points + score
 
     def hold(self):
-        """Player decides to roll the dice."""
+        """
+        Player decides to hold the round points.
+
+        If a player decides to hold the round points
+        will be added to the total points. Afterwards the game evaluates
+        if the totalscore is higher or equal to 100 points.
+        If thats the case the game ends and the current player wins.
+        """
         msg = "No active game!"
         if self.game_state < 0:
             return msg
@@ -162,7 +174,13 @@ class Game:
         return name + score
 
     def set_ai(self, state, difficulty):
-        """Enable the AI."""
+        """
+        Enable the AI.
+
+        If the state parameter quals to ture the ai will be enabled
+        and the difficulty will be set.
+        Otherwise the ai will be disabled.
+        """
         if state == "true":
             self.active_ai = 1
             self.ai.update_difficulty(difficulty)
@@ -172,7 +190,12 @@ class Game:
             print("AI is disabled for the next game!")
 
     def play_ai(self):
-        """Let the AI do its moves."""
+        """
+        Let the AI do its moves.
+
+        Calls the game loop of the AI.
+        Afterwards a check runs if the AI has won the game.
+        """
         self.ai.evaluate_round()
         player = self.ai
         if player.dice_holder.get_total_points() >= 100:
@@ -184,19 +207,33 @@ class Game:
         self.game_state = (self.game_state + 1) % self.amount_players
 
     def quit(self):
-        """Pause/Quit current game."""
+        """
+        Pause/Quit current game.
+
+        If a game is currently active it will be paused
+        and the gamestate will be saved.
+        """
         if self.game_state >= 0:
             self.save_game = self.game_state
             self.game_state = -1
 
     def cheat(self):
-        """Set the current players points to 99."""
+        """
+        Help a player to win faster.
+
+        Set the current players points to 99.
+        """
         self.cheated_game = 1
         self.active_players[self.game_state].dice_holder.totalpoints = 99
         print("You cheated!\nYour total points are set to 99.")
 
     def restart(self):
-        """Restart paused game."""
+        """
+        Restart paused game.
+
+        If a running game has been quit it will be restarted
+        and the saved data will be loaded.
+        """
         if self.save_game > 0:
             self.game_state = self.save_game
         else:
