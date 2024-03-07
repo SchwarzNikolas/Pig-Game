@@ -25,18 +25,69 @@ class TestHighscoreClass(unittest.TestCase):
         exp = 0
         self.assertEqual(res, exp)
 
-        res = highscore.lowest_roll_count
+        res = highscore.lowest_roll
         exp = 0
         self.assertEqual(res, exp)
 
-        res = highscore.lowest_round_count
+        res = highscore.lowest_round
         exp = 0
         self.assertEqual(res, exp)
 
-        res = highscore.highest_points_in_one_round
-        exp = 0
-        self.assertEqual(res, exp)
+        res = highscore.highest_points
 
     def test_updated_values(self):
+        """Check if values have updated."""
         highscore = Highscore()
-        highscore.update_highscore()
+        highscore.update_highscore(1, 1, 1, 1)
+
+        exp = 1
+        res = highscore.lowest_roll
+        self.assertEqual(exp, res)
+
+        exp = 1
+        res = highscore.lowest_round
+        self.assertEqual(exp, res)
+
+        exp = 1
+        res = highscore.highest_points
+        self.assertEqual(exp, res)
+
+        exp = 1
+        res = highscore.all_time_points
+        self.assertEqual(exp, res)
+
+        exp = 1
+        res = highscore.all_time_wins
+        self.assertEqual(exp, res)
+
+    def test_reset_stats(self):
+        """Confirm that the values reset to zero."""
+        highscore = Highscore()
+
+        highscore.all_time_points = 1
+        highscore.all_time_wins = 1
+        highscore.lowest_roll = 1
+        highscore.lowest_round = 1
+        highscore.highest_points = 1
+
+        highscore.reset_highscore()
+
+        res = highscore.all_time_points
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = highscore.all_time_wins
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = highscore.lowest_roll
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = highscore.lowest_round
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = highscore.highest_points
+        exp = 0
+        self.assertEqual(res, exp)
