@@ -8,8 +8,9 @@ from game.intelligence import BinaryBrain
 class Output(Cmd):
     """Class with methods to interact with the player."""
 
-    pink_pig_colour = "\33[95m"
-    welcome_colour = "\x1b[38;2;5;86;243m"
+    # colours which could be used for printing
+    pig_colour = "\x1b[38;2;222;93;131m"
+    welcome_colour = "\x1b[38;2;170;219;30m"
     round_over_colour = "\33[91m"
     winning_colour = "\33[92m"
     keep_going_colour = "\33[94m"
@@ -18,7 +19,7 @@ class Output(Cmd):
     italics = "\33[3m"
     intro = f"{welcome_colour}Welcome to Pig Game.{end_colour}\
 \nType help or ? to list commands.\n"
-    Cmd.prompt = "(pig-game) "
+    Cmd.prompt = f"{pig_colour}(pig-game) {end_colour}"
     completekey = "tab"
 
     def __init__(self):
@@ -173,7 +174,7 @@ class Output(Cmd):
             if players[self.game.game_state].player_name != "BinaryBrain":
                 Cmd.prompt = f"({players[index].player_name}) "
         else:
-            Cmd.prompt = "(pig-game) "
+            Cmd.prompt = f"{Output.pig_colour}(pig-game) {Output.end_colour}"
         return False
 
     def do_exit(self, _):
