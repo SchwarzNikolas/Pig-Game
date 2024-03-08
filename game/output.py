@@ -9,7 +9,7 @@ class Output(Cmd):
     """Class with methods to interact with the player."""
 
     pink_pig_colour = "\33[95m"
-    welcome_colour = "\33[43m"
+    welcome_colour = "\x1b[38;2;5;86;243m"
     round_over_colour = "\33[91m"
     winning_colour = "\33[92m"
     keep_going_colour = "\33[94m"
