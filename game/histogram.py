@@ -17,7 +17,7 @@ class Histogram:
         """Bar."""
         bar = '∎' * int(num/scale)
         print(f"{name:^10} | {num:^5} | {colour}{bar[:35]}{self.end}")
-        print(f"{'>< ' * 17 }")
+        print(f"{'>< ' * 19 }")
 
     def key(self):
         """Key to assist reading Histograms."""
