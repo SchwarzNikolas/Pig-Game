@@ -167,7 +167,8 @@ class Game:
         if player.dice_holder.get_total_points() >= 100:
             self.game_state = -1
             self.active_ai = 0
-            player.update_scores(1)
+            if self.cheated_game == 0:
+                player.update_scores(1)
             return f"{player.player_name} has won the game!"
         self.game_state = (self.game_state + 1) % self.amount_players
         name = f"\n{player.player_name}'s total points are now: "
