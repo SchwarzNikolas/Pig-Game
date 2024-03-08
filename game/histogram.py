@@ -15,18 +15,19 @@ class Histogram:
 
     def barchart(self, name, num, colour, scale):
         """Bar."""
-        print(f"{name} | {num} | {colour}{'∎' * int(num/scale)}{self.end}")
-        print(f"{'>< ' * 24 }")
+        bar = '∎' * int(num/scale)
+        print(f"{name} | {num} | {colour}{bar[:35]}{self.end}")
+        print(f"{'>< ' * 17 }")
 
     def key(self):
         """Key to assist reading Histograms."""
         print("------------ KEY ------------")
         print(f"{'=' * 29}")
-        print(f"{self.colour1}∎  | {'lowest rolls':^17} |  1:1{self.end}")
-        print(f"{self.colour2}∎  | {'lowest rounds':^17} |  1:1{self.end}")
-        print(f"{self.colour3}∎  | {'highest points':^17} |  1:1{self.end}")
-        print(f"{self.colour4}∎  | {'all time points':^17} |  1:1{self.end}")
-        print(f"{self.colour5}∎  | {'all time wins':^17} |  1:1{self.end}")
+        print(f"{self.colour1}∎  | {'lowest rolls':^16} |  1:17{self.end}")
+        print(f"{self.colour2}∎  | {'lowest rounds':^16} |   1:2{self.end}")
+        print(f"{self.colour3}∎  | {'highest points':^16} |   1:6{self.end}")
+        print(f"{self.colour4}∎  | {'all time points':^16} | 1:100{self.end}")
+        print(f"{self.colour5}∎  | {'all time wins':^16} |   1:1{self.end}")
         print(f"{'=' * 29}")
         print("Note on scale -> block:score\n")
 
@@ -37,8 +38,8 @@ class Histogram:
             name = player.player_name
             rolls, rounds, max_points, points, wins = player.return_stats()
             self.barchart(name, rolls, self.colour1, 17)
-            self.barchart(name, rounds, self.colour2, 1)
-            self.barchart(name, max_points, self.colour3, 10)
+            self.barchart(name, rounds, self.colour2, 2)
+            self.barchart(name, max_points, self.colour3, 6)
             self.barchart(name, points, self.colour4, 100)
             self.barchart(name, wins, self.colour5, 1)
             print()
