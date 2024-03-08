@@ -235,6 +235,14 @@ class TestOutputClass(unittest.TestCase):
         self.assertEqual(exp, res)
         sys.stdout = sys.__stdout__
 
+    @patch("sys.stdout", new_callable=io.StringIO)
+    def test_histogram(self, mock_stdout):
+        """Test the histogram command."""
+        output = Output()
+        output.do_histogram("")
+        exp = "------------ KEY ------------\n"
+        self.assertIn(exp, mock_stdout.getvalue())
+
     def test_exit(self):
         """Test the exit method."""
         sys.stdout = io.StringIO()
