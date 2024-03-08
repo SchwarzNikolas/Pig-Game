@@ -216,6 +216,7 @@ class TestOutputClass(unittest.TestCase):
 
     def test_postcmd(self):
         """Test the postcmd method."""
+        sys.stdout = io.StringIO()
         output = Output()
         res = output.postcmd(True, "")
         self.assertTrue(res)
@@ -232,6 +233,7 @@ class TestOutputClass(unittest.TestCase):
         res = output.game.game_state
         exp = 0
         self.assertEqual(exp, res)
+        sys.stdout = sys.__stdout__
 
     def test_exit(self):
         """Test the exit method."""
