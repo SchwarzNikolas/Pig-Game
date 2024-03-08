@@ -16,7 +16,7 @@ class TestHistogramClass(unittest.TestCase):
         exp = Histogram
         self.assertIsInstance(res, exp)
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_barchart(self, mock_stdout):
         """Test the bar chart."""
         histogram = Histogram()
@@ -26,7 +26,7 @@ class TestHistogramClass(unittest.TestCase):
         exp = exp1 + exp2
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_key(self, mock_stdout):
         """Test key output."""
         his = Histogram()
@@ -43,7 +43,7 @@ class TestHistogramClass(unittest.TestCase):
         exp = exp1 + exp2 + exp3 + exp4 + exp5 + exp6 + exp7 + exp8 + exp9
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_display(self, mock_stdout):
         """Test display method."""
         his = Histogram()

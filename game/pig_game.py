@@ -247,9 +247,11 @@ class Game:
         Show all players stats.
 
         Prints out charts about each players stats.
+        Returns true if histogram is displayed sucessfully.
         """
         histogram = Histogram()
         histogram.display(self.players)
+        return True
 
     def exit(self):
         """

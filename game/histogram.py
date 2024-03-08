@@ -15,7 +15,7 @@ class Histogram:
 
     def barchart(self, name, num, colour, scale):
         """Bar."""
-        bar = '∎' * int(num/scale)
+        bar = "∎" * int(num / scale)
         print(f"{name:^10} | {num:^5} | {colour}{bar[:35]}{self.end}")
         print(f"{'>< ' * 19 }")
 

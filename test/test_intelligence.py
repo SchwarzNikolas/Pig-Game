@@ -48,7 +48,7 @@ class TestIntelligenceClass(unittest.TestCase):
         exp = 2
         self.assertEqual(exp, res)
 
-    @patch('game.intelligence.BinaryBrain.easy')
+    @patch("game.intelligence.BinaryBrain.easy")
     def test_difficulty_easy(self, mock_easy):
         """Test if the difficulty changes correctly."""
         mock_easy.return_value = False
@@ -58,7 +58,7 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.keep_going
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.medium')
+    @patch("game.intelligence.BinaryBrain.medium")
     def test_difficulty_medium(self, mock_medium):
         """Test if the difficulty changes correctly."""
         mock_medium.return_value = False
@@ -68,7 +68,7 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.keep_going
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.hard')
+    @patch("game.intelligence.BinaryBrain.hard")
     def test_difficulty_hard(self, mock_hard):
         """Test if the difficulty changes correctly."""
         mock_hard.return_value = False
@@ -78,7 +78,7 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.keep_going
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.roll_dice')
+    @patch("game.intelligence.BinaryBrain.roll_dice")
     def test_roll(self, mock_roll_dice):
         """Test if the AIs roll method works."""
         mock_roll_dice.return_value = 2
@@ -110,7 +110,7 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.easy()
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.roll')
+    @patch("game.intelligence.BinaryBrain.roll")
     def test_easy_roll(self, mock_roll):
         """Test the easy difficulties roll abilty."""
         mock_roll.return_value = True
@@ -125,7 +125,7 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.medium()
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.roll')
+    @patch("game.intelligence.BinaryBrain.roll")
     def test_medium_roll(self, mock_roll):
         """Test the easy difficulties roll abilty."""
         mock_roll.return_value = True
@@ -145,8 +145,8 @@ class TestIntelligenceClass(unittest.TestCase):
         res = binarybrain.hard()
         self.assertFalse(res)
 
-    @patch('game.intelligence.BinaryBrain.roll')
-    @patch('random.randint')
+    @patch("game.intelligence.BinaryBrain.roll")
+    @patch("random.randint")
     def test_hard_roll(self, mock_roll, mock_random):
         """Test the hard difficulties roll abilty."""
         mock_roll.return_value = True

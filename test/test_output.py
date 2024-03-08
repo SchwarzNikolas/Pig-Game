@@ -19,7 +19,7 @@ class TestOutputClass(unittest.TestCase):
         exp = Output
         self.assertIsInstance(res, exp)
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_profile(self, mock_stdout):
         """Test all possible profile commands."""
         output = Output()
@@ -99,7 +99,7 @@ class TestOutputClass(unittest.TestCase):
         exp = "Player Test1 doesn't exist.\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_rules(self, mock_stdout):
         """Test the rules output."""
         output = Output()
@@ -108,7 +108,7 @@ class TestOutputClass(unittest.TestCase):
             exp = file.read() + "\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_hold(self, mock_stdout):
         """Test the hold method."""
         output = Output()
@@ -116,7 +116,7 @@ class TestOutputClass(unittest.TestCase):
         exp = "No active game!\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_roll(self, mock_stdout):
         """Test the roll method."""
         output = Output()
@@ -124,7 +124,7 @@ class TestOutputClass(unittest.TestCase):
         exp = "No active game!\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_start(self, mock_stdout):
         """Test the start method."""
         output = Output()
@@ -147,7 +147,7 @@ class TestOutputClass(unittest.TestCase):
         exp = "The amount of players must be between 1 and 6.\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_ai(self, mock_stdout):
         """Test the ai method."""
         output = Output()
