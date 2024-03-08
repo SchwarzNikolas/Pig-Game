@@ -42,7 +42,7 @@ class Player:
     def update_scores(self, win):
         """Update museum after finished game."""
         rolls = self.dice_holder.get_amount_of_rolls()
-        rounds = self.dice_holder.get_total_points()
-        points = self.dice_holder.get_rounds()
+        rounds = self.dice_holder.get_rounds()
+        points = self.dice_holder.get_total_points()
 
         self.highscores.update_highscore(rolls, rounds, points, win)
