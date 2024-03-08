@@ -1,4 +1,4 @@
-"""Unit Test for the Output Module."""
+"""Unit Test for the Output Module and partially for the Game Module."""
 
 import unittest
 import io
