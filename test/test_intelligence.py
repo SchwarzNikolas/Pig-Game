@@ -1,12 +1,20 @@
 """Unit Test for the Intelligence Module."""
 
 import unittest
+import sys
+import io
 from unittest.mock import patch
 from game.intelligence import BinaryBrain
 
 
 class TestIntelligenceClass(unittest.TestCase):
     """Test the Intelligence class."""
+
+    def setUp(self):
+        sys.stdout = io.StringIO()
+
+    def tearDown(self):
+        sys.stdout = sys.__stdout__
 
     def test_init_default_object(self):
         """Instantiate an object and check its properties."""
