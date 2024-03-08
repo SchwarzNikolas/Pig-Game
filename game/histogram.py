@@ -13,9 +13,10 @@ class Histogram:
         self.colour5 = "\x1b[38;2;26;101;158m"
         self.end = "\x1b[0m"
 
-    def barchart(self, name, num, colour):
+    def barchart(self, name, num, colour, scale):
         """Bar."""
-        print(f"{name} | {num} | {colour}{'∎' * int(num/17)}{self.end}")
+        print(f"{name} | {num} | {colour}{'∎' * int(num/scale)}{self.end}")
+        print(f"{'>< ' * 12 }")
 
     def key(self):
         """Key to assist reading Histograms."""
@@ -29,7 +30,15 @@ class Histogram:
         print(f"{'=' * 29}")
         print("Note on scale -> block:score\n")
 
-
-histogram = Histogram()
-histogram.key()
-histogram.barchart("Isaac", 200, histogram.colour1)
+    def display(self, players):
+        """Display the stats for each Player."""
+        self.key()
+        for player in players:
+            name = player.player_name
+            rolls, rounds, max_points, points, wins = player.return_stats()
+            self.barchart(name, rolls, self.colour1, 17)
+            self.barchart(name, rounds, self.colour2, 1)
+            self.barchart(name, max_points, self.colour3, 10)
+            self.barchart(name, points, self.colour4, 100)
+            self.barchart(name, wins, self.colour5, 1)
+            print()
