@@ -7,6 +7,7 @@ from unittest.mock import patch
 from unittest import mock
 from game.output import Output
 from game.player import Player
+from game.intelligence import BinaryBrain
 
 
 class TestOutputClass(unittest.TestCase):
@@ -123,6 +124,66 @@ class TestOutputClass(unittest.TestCase):
         exp = "No active game!\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_start(self, mock_stdout):
+        """Test the start method."""
+        output = Output()
+        output.do_start("")
+        exp = "Missing argument, provide player names\n"
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+        mock_stdout.truncate(0)
+        mock_stdout.seek(0)
+
+        output.game.players.append(Player("Test"))
+        output.do_start("Test")
+        exp = "AI will join this game!\nGame started, Test begins!\n"
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+        mock_stdout.truncate(0)
+        mock_stdout.seek(0)
+
+        output.do_start("Test1, Test2, Test3, Test4, Test5, Test6, Test7")
+        exp = "The amount of players must be between 1 and 6.\n"
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_ai(self, mock_stdout):
+        """Test the ai method."""
+        output = Output()
+        output.do_ai("")
+        exp = "No arguments given!\n"
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+        mock_stdout.truncate(0)
+        mock_stdout.seek(0)
+
+        output.do_ai("test")
+        exp = 'Garbage argument. Use "help ai".\n'
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+        mock_stdout.truncate(0)
+        mock_stdout.seek(0)
+
+        output.do_ai("true -l")
+        exp = 'Garbage argument. Use "help ai".\n'
+        self.assertEqual(exp, mock_stdout.getvalue())
+
+        output.do_ai("true -e")
+        res = output.game.ai.difficulty
+        exp = 0
+        self.assertEqual(exp, res)
+
+        output.do_ai("true -m")
+        res = output.game.ai.difficulty
+        exp = 1
+        self.assertEqual(exp, res)
+
+        output.do_ai("true -h")
+        res = output.game.ai.difficulty
+        exp = 2
+        self.assertEqual(exp, res)
+
     def test_cheat(self):
         """Test the cheat method."""
         sys.stdout = io.StringIO()
@@ -151,6 +212,25 @@ class TestOutputClass(unittest.TestCase):
         output.do_restart("restart")
         res = output.game.game_state
         exp = 2
+        self.assertEqual(exp, res)
+
+    def test_postcmd(self):
+        """Test the postcmd method."""
+        output = Output()
+        res = output.postcmd(True, "")
+        self.assertTrue(res)
+
+        res = output.postcmd(False, "")
+        self.assertFalse(res)
+
+        binarybrain = BinaryBrain()
+        output.game.active_players.append(Player("Test"))
+        output.game.active_players.append(binarybrain)
+        output.game.game_state = 1
+        output.game.amount_players = 2
+        output.postcmd(False, "")
+        res = output.game.game_state
+        exp = 0
         self.assertEqual(exp, res)
 
     def test_exit(self):
