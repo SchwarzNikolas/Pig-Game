@@ -64,3 +64,35 @@ class Test_DiceHand(unittest.TestCase):
         res = dicehand.get_rounds()
         exp = 2
         self.assertEqual(res, exp)
+
+    def test_reset(self):
+        dicehand = DiceHand()
+
+        dicehand.update_hand(5)
+        dicehand.hold()
+        dicehand.reset()
+
+        res = dicehand.roundpoints
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = dicehand.rounds
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = dicehand.amountofrolls
+        exp = 0
+        self.assertEqual(res, exp)
+
+        res = dicehand.totalpoints
+        exp = 0
+        self.assertEqual(res, exp)
+
+    def test_get_round_points(self):
+        dicehand = DiceHand()
+
+        dicehand.update_hand(6)
+
+        res = dicehand.get_round_points()
+        exp = 6
+        self.assertEqual(res, exp)
