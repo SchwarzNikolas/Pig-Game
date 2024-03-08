@@ -70,19 +70,22 @@ class TestPlayerClass(unittest.TestCase):
     def test_return_stats(self):
         """Test if statistics are shown."""
         player = Player("Test")
-
-        player.highscores.all_time_points = 1
-        player.highscores.all_time_wins = 1
-        player.highscores.lowest_roll = 1
-        player.highscores.lowest_round = 1
-        player.highscores.highest_points = 1
+        player.highscores.lowest_roll = 20
+        player.highscores.lowest_round = 4
+        player.highscores.highest_points = 105
+        player.highscores.all_time_points = 100
+        player.highscores.all_time_wins = 10
 
         res1, res2, res3, res4, res5 = player.return_stats()
-        exp = 1
+        exp = 20
         self.assertEqual(res1, exp)
+        exp = 4
         self.assertEqual(res2, exp)
+        exp = 105
         self.assertEqual(res3, exp)
+        exp = 100
         self.assertEqual(res4, exp)
+        exp = 10
         self.assertEqual(res5, exp)
 
     def test_update_stats(self):

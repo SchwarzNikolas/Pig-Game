@@ -104,7 +104,7 @@ class TestOutputClass(unittest.TestCase):
         """Test the rules output."""
         output = Output()
         output.do_rules("rules")
-        with open("game/rules.txt", "r") as file:
+        with open("game/rules.txt", "r", -1, "utf-8") as file:
             exp = file.read() + "\n"
         self.assertEqual(exp, mock_stdout.getvalue())
 
