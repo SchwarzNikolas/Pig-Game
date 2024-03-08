@@ -5,7 +5,7 @@ from unittest.mock import patch
 from game.intelligence import BinaryBrain
 
 
-class TestPlayerClass(unittest.TestCase):
+class TestIntelligenceClass(unittest.TestCase):
     """Test the Intelligence class."""
 
     def test_init_default_object(self):
