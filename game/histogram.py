@@ -14,9 +14,9 @@ class Histogram:
         self.end = "\x1b[0m"
 
     def barchart(self, name, num, colour, scale):
-        """Bar."""
-        bar = "∎" * int(num / scale)
-        print(f"{name:^10} | {num:^5} | {colour}{bar[:35]}{self.end}")
+        """Print out the bar."""
+        box = "∎" * int(num / scale)
+        print(f"{name:^10} | {num:^5} | {colour}{box[:35]}{self.end}")
         print(f"{'>< ' * 19 }")
 
     def key(self):
