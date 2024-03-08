@@ -144,6 +144,10 @@ class Output(Cmd):
         """Help the player to finish the game faster."""
         self.game.cheat()
 
+    def do_histogram(self, _):
+        """Print out the stats of all saved players."""
+        self.game.show_histogram()
+
     def do_rules(self, _):
         """Print out the rules of the game."""
         with open("game/rules.txt", "r", -1, "utf-8") as file:

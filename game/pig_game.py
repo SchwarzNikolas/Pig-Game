@@ -3,6 +3,7 @@
 import pickle
 from game.player import Player
 from game.intelligence import BinaryBrain
+from game.histogram import Histogram
 
 
 class Game:
@@ -240,6 +241,15 @@ class Game:
             self.game_state = self.save_game
         else:
             print("There is no paused game!")
+
+    def show_histogram(self):
+        """
+        Show all players stats.
+
+        Prints out charts about each players stats.
+        """
+        histogram = Histogram()
+        histogram.display(self.players)
 
     def exit(self):
         """
