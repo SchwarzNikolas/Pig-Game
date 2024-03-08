@@ -16,7 +16,7 @@ class Histogram:
     def barchart(self, name, num, colour, scale):
         """Bar."""
         print(f"{name} | {num} | {colour}{'∎' * int(num/scale)}{self.end}")
-        print(f"{'>< ' * 12 }")
+        print(f"{'>< ' * 24 }")
 
     def key(self):
         """Key to assist reading Histograms."""
