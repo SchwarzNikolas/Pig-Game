@@ -36,8 +36,8 @@ class Player:
         """Museum of your previous games."""
         lowest_roll, lowest_round = self.highscores.return_low_stats()
         highest_points = self.highscores.return_high_stats()
-        wins, all_time_points = self.highscores.return_all_time_stats()
-        return lowest_roll, lowest_round, highest_points, wins, all_time_points
+        all_time_points, wins = self.highscores.return_all_time_stats()
+        return lowest_roll, lowest_round, highest_points, all_time_points, wins
 
     def update_scores(self, win):
         """Update museum after finished game."""
