@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>dicehand API documentation</title>
-<meta name="description" content="Using result of rolling dice" />
+<meta name="description" content="Using result of rolling dice." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,38 +22,62 @@
 <h1 class="title">Module <code>dicehand</code></h1>
 </header>
 <section id="section-intro">
-<p>Using result of rolling dice</p>
+<p>Using result of rolling dice.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;Using result of rolling dice&#34;
+<pre><code class="python">&#34;&#34;&#34;Using result of rolling dice.&#34;&#34;&#34;
+
 
 class DiceHand:
-    &#34;Keeps track of integer variables and returns them with getters&#34;
+    &#34;&#34;&#34;Keeps track of integer variables and returns them with getters.&#34;&#34;&#34;
 
     def __init__(self):
-        self.points = 0
+        &#34;&#34;&#34;Initialize self.&#34;&#34;&#34;
+        self.roundpoints = 0
         self.rounds = 0
-        self.rollamount = 0
+        self.amountofrolls = 0
+        self.totalpoints = 0
 
-    def updateHand(self, diceroll):
+    def update_hand(self, diceroll):
+        &#34;&#34;&#34;Update values of object.&#34;&#34;&#34;
         if diceroll != 1:
-            self.points += diceroll
-            self.rollamount += 1
+            self.roundpoints += diceroll
+            self.amountofrolls += 1
         else:
-            &#34;placeholder for sending result to highscore/histogram&#34;
-            self.points = 0
+            self.amountofrolls += 1
+            self.roundpoints = 0
             self.rounds += 1
 
-    def getRoundPoints(self):
-        return self.points
+    def hold(self):
+        &#34;&#34;&#34;End round.&#34;&#34;&#34;
+        self.totalpoints += self.roundpoints
+        self.roundpoints = 0
+        self.rounds += 1
 
-    def getRoundsplayed(self):
+    def reset(self):
+        &#34;&#34;&#34;Reset values.&#34;&#34;&#34;
+        self.roundpoints = 0
+        self.rounds = 0
+        self.amountofrolls = 0
+        self.totalpoints = 0
+
+    def get_amount_of_rolls(self):
+        &#34;&#34;&#34;Get amount of rolls.&#34;&#34;&#34;
+        return self.amountofrolls
+
+    def get_rounds(self):
+        &#34;&#34;&#34;Get rounds.&#34;&#34;&#34;
         return self.rounds
 
-    def getRollAmount(self):
-        return self.rollamount</code></pre>
+    def get_total_points(self):
+        &#34;&#34;&#34;Get total points.&#34;&#34;&#34;
+        return self.totalpoints
+
+    def get_round_points(self):
+        &#34;&#34;&#34;Get points of current round.&#34;&#34;&#34;
+        return self.roundpoints</code></pre>
 </details>
 </section>
 <section>
@@ -69,94 +93,169 @@ class DiceHand:
 <span>class <span class="ident">DiceHand</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Keeps track of integer variables and returns them with getters</p></div>
+<div class="desc"><p>Keeps track of integer variables and returns them with getters.</p>
+<p>Initialize self.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DiceHand:
-    &#34;Keeps track of integer variables and returns them with getters&#34;
+    &#34;&#34;&#34;Keeps track of integer variables and returns them with getters.&#34;&#34;&#34;
 
     def __init__(self):
-        self.points = 0
+        &#34;&#34;&#34;Initialize self.&#34;&#34;&#34;
+        self.roundpoints = 0
         self.rounds = 0
-        self.rollamount = 0
+        self.amountofrolls = 0
+        self.totalpoints = 0
 
-    def updateHand(self, diceroll):
+    def update_hand(self, diceroll):
+        &#34;&#34;&#34;Update values of object.&#34;&#34;&#34;
         if diceroll != 1:
-            self.points += diceroll
-            self.rollamount += 1
+            self.roundpoints += diceroll
+            self.amountofrolls += 1
         else:
-            &#34;placeholder for sending result to highscore/histogram&#34;
-            self.points = 0
+            self.amountofrolls += 1
+            self.roundpoints = 0
             self.rounds += 1
 
-    def getRoundPoints(self):
-        return self.points
+    def hold(self):
+        &#34;&#34;&#34;End round.&#34;&#34;&#34;
+        self.totalpoints += self.roundpoints
+        self.roundpoints = 0
+        self.rounds += 1
 
-    def getRoundsplayed(self):
+    def reset(self):
+        &#34;&#34;&#34;Reset values.&#34;&#34;&#34;
+        self.roundpoints = 0
+        self.rounds = 0
+        self.amountofrolls = 0
+        self.totalpoints = 0
+
+    def get_amount_of_rolls(self):
+        &#34;&#34;&#34;Get amount of rolls.&#34;&#34;&#34;
+        return self.amountofrolls
+
+    def get_rounds(self):
+        &#34;&#34;&#34;Get rounds.&#34;&#34;&#34;
         return self.rounds
 
-    def getRollAmount(self):
-        return self.rollamount</code></pre>
+    def get_total_points(self):
+        &#34;&#34;&#34;Get total points.&#34;&#34;&#34;
+        return self.totalpoints
+
+    def get_round_points(self):
+        &#34;&#34;&#34;Get points of current round.&#34;&#34;&#34;
+        return self.roundpoints</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="dicehand.DiceHand.getRollAmount"><code class="name flex">
-<span>def <span class="ident">getRollAmount</span></span>(<span>self)</span>
+<dt id="dicehand.DiceHand.get_amount_of_rolls"><code class="name flex">
+<span>def <span class="ident">get_amount_of_rolls</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Get amount of rolls.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getRollAmount(self):
-    return self.rollamount</code></pre>
+<pre><code class="python">def get_amount_of_rolls(self):
+    &#34;&#34;&#34;Get amount of rolls.&#34;&#34;&#34;
+    return self.amountofrolls</code></pre>
 </details>
 </dd>
-<dt id="dicehand.DiceHand.getRoundPoints"><code class="name flex">
-<span>def <span class="ident">getRoundPoints</span></span>(<span>self)</span>
+<dt id="dicehand.DiceHand.get_round_points"><code class="name flex">
+<span>def <span class="ident">get_round_points</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Get points of current round.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getRoundPoints(self):
-    return self.points</code></pre>
+<pre><code class="python">def get_round_points(self):
+    &#34;&#34;&#34;Get points of current round.&#34;&#34;&#34;
+    return self.roundpoints</code></pre>
 </details>
 </dd>
-<dt id="dicehand.DiceHand.getRoundsplayed"><code class="name flex">
-<span>def <span class="ident">getRoundsplayed</span></span>(<span>self)</span>
+<dt id="dicehand.DiceHand.get_rounds"><code class="name flex">
+<span>def <span class="ident">get_rounds</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Get rounds.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getRoundsplayed(self):
+<pre><code class="python">def get_rounds(self):
+    &#34;&#34;&#34;Get rounds.&#34;&#34;&#34;
     return self.rounds</code></pre>
 </details>
 </dd>
-<dt id="dicehand.DiceHand.updateHand"><code class="name flex">
-<span>def <span class="ident">updateHand</span></span>(<span>self, diceroll)</span>
+<dt id="dicehand.DiceHand.get_total_points"><code class="name flex">
+<span>def <span class="ident">get_total_points</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Get total points.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def updateHand(self, diceroll):
+<pre><code class="python">def get_total_points(self):
+    &#34;&#34;&#34;Get total points.&#34;&#34;&#34;
+    return self.totalpoints</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.hold"><code class="name flex">
+<span>def <span class="ident">hold</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>End round.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hold(self):
+    &#34;&#34;&#34;End round.&#34;&#34;&#34;
+    self.totalpoints += self.roundpoints
+    self.roundpoints = 0
+    self.rounds += 1</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset values.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self):
+    &#34;&#34;&#34;Reset values.&#34;&#34;&#34;
+    self.roundpoints = 0
+    self.rounds = 0
+    self.amountofrolls = 0
+    self.totalpoints = 0</code></pre>
+</details>
+</dd>
+<dt id="dicehand.DiceHand.update_hand"><code class="name flex">
+<span>def <span class="ident">update_hand</span></span>(<span>self, diceroll)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update values of object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_hand(self, diceroll):
+    &#34;&#34;&#34;Update values of object.&#34;&#34;&#34;
     if diceroll != 1:
-        self.points += diceroll
-        self.rollamount += 1
+        self.roundpoints += diceroll
+        self.amountofrolls += 1
     else:
-        &#34;placeholder for sending result to highscore/histogram&#34;
-        self.points = 0
+        self.amountofrolls += 1
+        self.roundpoints = 0
         self.rounds += 1</code></pre>
 </details>
 </dd>
@@ -175,11 +274,14 @@ class DiceHand:
 <ul>
 <li>
 <h4><code><a title="dicehand.DiceHand" href="#dicehand.DiceHand">DiceHand</a></code></h4>
-<ul class="">
-<li><code><a title="dicehand.DiceHand.getRollAmount" href="#dicehand.DiceHand.getRollAmount">getRollAmount</a></code></li>
-<li><code><a title="dicehand.DiceHand.getRoundPoints" href="#dicehand.DiceHand.getRoundPoints">getRoundPoints</a></code></li>
-<li><code><a title="dicehand.DiceHand.getRoundsplayed" href="#dicehand.DiceHand.getRoundsplayed">getRoundsplayed</a></code></li>
-<li><code><a title="dicehand.DiceHand.updateHand" href="#dicehand.DiceHand.updateHand">updateHand</a></code></li>
+<ul class="two-column">
+<li><code><a title="dicehand.DiceHand.get_amount_of_rolls" href="#dicehand.DiceHand.get_amount_of_rolls">get_amount_of_rolls</a></code></li>
+<li><code><a title="dicehand.DiceHand.get_round_points" href="#dicehand.DiceHand.get_round_points">get_round_points</a></code></li>
+<li><code><a title="dicehand.DiceHand.get_rounds" href="#dicehand.DiceHand.get_rounds">get_rounds</a></code></li>
+<li><code><a title="dicehand.DiceHand.get_total_points" href="#dicehand.DiceHand.get_total_points">get_total_points</a></code></li>
+<li><code><a title="dicehand.DiceHand.hold" href="#dicehand.DiceHand.hold">hold</a></code></li>
+<li><code><a title="dicehand.DiceHand.reset" href="#dicehand.DiceHand.reset">reset</a></code></li>
+<li><code><a title="dicehand.DiceHand.update_hand" href="#dicehand.DiceHand.update_hand">update_hand</a></code></li>
 </ul>
 </li>
 </ul>

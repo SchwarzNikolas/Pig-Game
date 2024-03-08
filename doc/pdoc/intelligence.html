@@ -27,7 +27,160 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Module for implementing game intelligence algorithms.&#34;&#34;&#34;</code></pre>
+<pre><code class="python">&#34;&#34;&#34;Module for implementing game intelligence algorithms.&#34;&#34;&#34;
+
+import random
+from game.dice import Dice
+from game.dicehand import DiceHand
+
+
+class BinaryBrain:
+    &#34;&#34;&#34;
+    Class for the computer player.
+
+    Can act as an additional player.
+    Difficulty can be adjusted between:
+    -easy
+    -medium
+    -hard
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;
+        Beginning of the AI.
+
+        Create AI&#39;s dicehand object, set its name and difficulty.
+        Additionally set the random seed.
+        &#34;&#34;&#34;
+        self.dice_holder = DiceHand()
+        self.player_name = &#34;BinaryBrain&#34;
+        self.difficulty = 0
+        self.keep_going = True
+        random.seed()
+
+    def roll_dice(self):
+        &#34;&#34;&#34;
+        AI rolls the dice.
+
+        Call the roll method on the dice object.
+        Update the dicehand with the rolled number.
+        Method returns the rolled number.
+        &#34;&#34;&#34;
+        dice = Dice()
+        roll_number = dice.roll()
+        self.dice_holder.update_hand(roll_number)
+        return roll_number
+
+    def update_difficulty(self, difficulty):
+        &#34;&#34;&#34;
+        Set the difficulty of the AI.
+
+        Change the difficulty level according to the parameter.
+        Can can range from 0-2, where 0 is the easiest difficulty.
+        &#34;&#34;&#34;
+        self.difficulty = difficulty
+
+    def evaluate_round(self):
+        &#34;&#34;&#34;
+        Let the AI play its turn.
+
+        Loop which runs until the AI decides to hold its points or rolls a 1.
+        Starts a different algorithm according to the difficulty varaible.
+        &#34;&#34;&#34;
+        self.keep_going = True
+        while self.keep_going:
+            match self.difficulty:
+                case 0:
+                    self.keep_going = self.easy()
+                case 1:
+                    self.keep_going = self.medium()
+                case 2:
+                    self.keep_going = self.hard()
+
+    def roll(self):
+        &#34;&#34;&#34;
+        Roll the dice and evaluate result.
+
+        Rolls the dice, evaluates and prints out result.
+        &#34;&#34;&#34;
+        roll = self.roll_dice()
+        round_points = self.dice_holder.get_round_points()
+        total_points = self.dice_holder.get_total_points()
+        if roll == 1:
+            print(&#34;BinaryBrain has rolled a 1 and lost its round points.&#34;)
+            print(f&#34;\nTotal score: {total_points}\n&#34;)
+            return False
+        print(f&#34;BinaryBrain has rolled a {roll}.&#34;)
+        points = f&#34;Round score: {round_points}&#34;
+        score = f&#34;\nTotal score: {total_points}\n&#34;
+        print(points + score)
+        return True
+
+    def hold(self):
+        &#34;&#34;&#34;
+        Hold the round points.
+
+        AI decides to transver the round points to its total points.
+        Print out the results afterwards.
+        &#34;&#34;&#34;
+        self.dice_holder.hold()
+        total_points = self.dice_holder.get_total_points()
+        print(&#34;\nBinaryBrain has kept its points.&#34;)
+        print(f&#34;Its total score is now: {total_points}&#34;)
+
+    def easy(self):
+        &#34;&#34;&#34;
+        Easiest difficulty level of the AI.
+
+        The AI will always roll until it has 15 round points.
+        After it reaches 15 points it will hold.
+        If the AI rolls a one or holds it will return False,
+        so that the playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_round_points() &lt; 15:
+            return self.roll()
+        self.hold()
+        return False
+
+    def medium(self):
+        &#34;&#34;&#34;
+        Medium difficulty level of the AI.
+
+        The AI will always roll until it has 20 round points.
+        After it reaches 20 points it will hold.
+        If the AI rolls a one or holds it will return False,
+        so that the playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_round_points() &lt; 20:
+            return self.roll()
+        self.hold()
+        return False
+
+    def hard(self):
+        &#34;&#34;&#34;
+        Hard difficulty level of the AI.
+
+        AI will always roll until it has 20 points,
+        between 20 and 25 points it will randomly decide if it wants
+        to hold or to continue playing.
+        If the AI has 70 total points it will roll until it wins.
+        If the AI rolls a one or holds it will return False, so that the
+        playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_total_points() &gt; 70:
+            points_to_win = 100 - self.dice_holder.get_total_points()
+            if self.dice_holder.get_round_points() &gt;= points_to_win:
+                self.hold()
+                return False
+            return self.roll()
+        if self.dice_holder.get_round_points() &lt; 20:
+            return self.roll()
+        if self.dice_holder.get_round_points() &lt; 26:
+            decision = random.randint(0, 1)
+            if decision == 1:
+                return self.roll()
+        self.hold()
+        return False</code></pre>
 </details>
 </section>
 <section>
@@ -37,6 +190,406 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="intelligence.BinaryBrain"><code class="flex name class">
+<span>class <span class="ident">BinaryBrain</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class for the computer player.</p>
+<p>Can act as an additional player.
+Difficulty can be adjusted between:
+-easy
+-medium
+-hard</p>
+<p>Beginning of the AI.</p>
+<p>Create AI's dicehand object, set its name and difficulty.
+Additionally set the random seed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BinaryBrain:
+    &#34;&#34;&#34;
+    Class for the computer player.
+
+    Can act as an additional player.
+    Difficulty can be adjusted between:
+    -easy
+    -medium
+    -hard
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;
+        Beginning of the AI.
+
+        Create AI&#39;s dicehand object, set its name and difficulty.
+        Additionally set the random seed.
+        &#34;&#34;&#34;
+        self.dice_holder = DiceHand()
+        self.player_name = &#34;BinaryBrain&#34;
+        self.difficulty = 0
+        self.keep_going = True
+        random.seed()
+
+    def roll_dice(self):
+        &#34;&#34;&#34;
+        AI rolls the dice.
+
+        Call the roll method on the dice object.
+        Update the dicehand with the rolled number.
+        Method returns the rolled number.
+        &#34;&#34;&#34;
+        dice = Dice()
+        roll_number = dice.roll()
+        self.dice_holder.update_hand(roll_number)
+        return roll_number
+
+    def update_difficulty(self, difficulty):
+        &#34;&#34;&#34;
+        Set the difficulty of the AI.
+
+        Change the difficulty level according to the parameter.
+        Can can range from 0-2, where 0 is the easiest difficulty.
+        &#34;&#34;&#34;
+        self.difficulty = difficulty
+
+    def evaluate_round(self):
+        &#34;&#34;&#34;
+        Let the AI play its turn.
+
+        Loop which runs until the AI decides to hold its points or rolls a 1.
+        Starts a different algorithm according to the difficulty varaible.
+        &#34;&#34;&#34;
+        self.keep_going = True
+        while self.keep_going:
+            match self.difficulty:
+                case 0:
+                    self.keep_going = self.easy()
+                case 1:
+                    self.keep_going = self.medium()
+                case 2:
+                    self.keep_going = self.hard()
+
+    def roll(self):
+        &#34;&#34;&#34;
+        Roll the dice and evaluate result.
+
+        Rolls the dice, evaluates and prints out result.
+        &#34;&#34;&#34;
+        roll = self.roll_dice()
+        round_points = self.dice_holder.get_round_points()
+        total_points = self.dice_holder.get_total_points()
+        if roll == 1:
+            print(&#34;BinaryBrain has rolled a 1 and lost its round points.&#34;)
+            print(f&#34;\nTotal score: {total_points}\n&#34;)
+            return False
+        print(f&#34;BinaryBrain has rolled a {roll}.&#34;)
+        points = f&#34;Round score: {round_points}&#34;
+        score = f&#34;\nTotal score: {total_points}\n&#34;
+        print(points + score)
+        return True
+
+    def hold(self):
+        &#34;&#34;&#34;
+        Hold the round points.
+
+        AI decides to transver the round points to its total points.
+        Print out the results afterwards.
+        &#34;&#34;&#34;
+        self.dice_holder.hold()
+        total_points = self.dice_holder.get_total_points()
+        print(&#34;\nBinaryBrain has kept its points.&#34;)
+        print(f&#34;Its total score is now: {total_points}&#34;)
+
+    def easy(self):
+        &#34;&#34;&#34;
+        Easiest difficulty level of the AI.
+
+        The AI will always roll until it has 15 round points.
+        After it reaches 15 points it will hold.
+        If the AI rolls a one or holds it will return False,
+        so that the playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_round_points() &lt; 15:
+            return self.roll()
+        self.hold()
+        return False
+
+    def medium(self):
+        &#34;&#34;&#34;
+        Medium difficulty level of the AI.
+
+        The AI will always roll until it has 20 round points.
+        After it reaches 20 points it will hold.
+        If the AI rolls a one or holds it will return False,
+        so that the playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_round_points() &lt; 20:
+            return self.roll()
+        self.hold()
+        return False
+
+    def hard(self):
+        &#34;&#34;&#34;
+        Hard difficulty level of the AI.
+
+        AI will always roll until it has 20 points,
+        between 20 and 25 points it will randomly decide if it wants
+        to hold or to continue playing.
+        If the AI has 70 total points it will roll until it wins.
+        If the AI rolls a one or holds it will return False, so that the
+        playing loop stops.
+        &#34;&#34;&#34;
+        if self.dice_holder.get_total_points() &gt; 70:
+            points_to_win = 100 - self.dice_holder.get_total_points()
+            if self.dice_holder.get_round_points() &gt;= points_to_win:
+                self.hold()
+                return False
+            return self.roll()
+        if self.dice_holder.get_round_points() &lt; 20:
+            return self.roll()
+        if self.dice_holder.get_round_points() &lt; 26:
+            decision = random.randint(0, 1)
+            if decision == 1:
+                return self.roll()
+        self.hold()
+        return False</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="intelligence.BinaryBrain.easy"><code class="name flex">
+<span>def <span class="ident">easy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Easiest difficulty level of the AI.</p>
+<p>The AI will always roll until it has 15 round points.
+After it reaches 15 points it will hold.
+If the AI rolls a one or holds it will return False,
+so that the playing loop stops.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def easy(self):
+    &#34;&#34;&#34;
+    Easiest difficulty level of the AI.
+
+    The AI will always roll until it has 15 round points.
+    After it reaches 15 points it will hold.
+    If the AI rolls a one or holds it will return False,
+    so that the playing loop stops.
+    &#34;&#34;&#34;
+    if self.dice_holder.get_round_points() &lt; 15:
+        return self.roll()
+    self.hold()
+    return False</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.evaluate_round"><code class="name flex">
+<span>def <span class="ident">evaluate_round</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Let the AI play its turn.</p>
+<p>Loop which runs until the AI decides to hold its points or rolls a 1.
+Starts a different algorithm according to the difficulty varaible.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def evaluate_round(self):
+    &#34;&#34;&#34;
+    Let the AI play its turn.
+
+    Loop which runs until the AI decides to hold its points or rolls a 1.
+    Starts a different algorithm according to the difficulty varaible.
+    &#34;&#34;&#34;
+    self.keep_going = True
+    while self.keep_going:
+        match self.difficulty:
+            case 0:
+                self.keep_going = self.easy()
+            case 1:
+                self.keep_going = self.medium()
+            case 2:
+                self.keep_going = self.hard()</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.hard"><code class="name flex">
+<span>def <span class="ident">hard</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Hard difficulty level of the AI.</p>
+<p>AI will always roll until it has 20 points,
+between 20 and 25 points it will randomly decide if it wants
+to hold or to continue playing.
+If the AI has 70 total points it will roll until it wins.
+If the AI rolls a one or holds it will return False, so that the
+playing loop stops.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hard(self):
+    &#34;&#34;&#34;
+    Hard difficulty level of the AI.
+
+    AI will always roll until it has 20 points,
+    between 20 and 25 points it will randomly decide if it wants
+    to hold or to continue playing.
+    If the AI has 70 total points it will roll until it wins.
+    If the AI rolls a one or holds it will return False, so that the
+    playing loop stops.
+    &#34;&#34;&#34;
+    if self.dice_holder.get_total_points() &gt; 70:
+        points_to_win = 100 - self.dice_holder.get_total_points()
+        if self.dice_holder.get_round_points() &gt;= points_to_win:
+            self.hold()
+            return False
+        return self.roll()
+    if self.dice_holder.get_round_points() &lt; 20:
+        return self.roll()
+    if self.dice_holder.get_round_points() &lt; 26:
+        decision = random.randint(0, 1)
+        if decision == 1:
+            return self.roll()
+    self.hold()
+    return False</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.hold"><code class="name flex">
+<span>def <span class="ident">hold</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Hold the round points.</p>
+<p>AI decides to transver the round points to its total points.
+Print out the results afterwards.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hold(self):
+    &#34;&#34;&#34;
+    Hold the round points.
+
+    AI decides to transver the round points to its total points.
+    Print out the results afterwards.
+    &#34;&#34;&#34;
+    self.dice_holder.hold()
+    total_points = self.dice_holder.get_total_points()
+    print(&#34;\nBinaryBrain has kept its points.&#34;)
+    print(f&#34;Its total score is now: {total_points}&#34;)</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.medium"><code class="name flex">
+<span>def <span class="ident">medium</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Medium difficulty level of the AI.</p>
+<p>The AI will always roll until it has 20 round points.
+After it reaches 20 points it will hold.
+If the AI rolls a one or holds it will return False,
+so that the playing loop stops.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def medium(self):
+    &#34;&#34;&#34;
+    Medium difficulty level of the AI.
+
+    The AI will always roll until it has 20 round points.
+    After it reaches 20 points it will hold.
+    If the AI rolls a one or holds it will return False,
+    so that the playing loop stops.
+    &#34;&#34;&#34;
+    if self.dice_holder.get_round_points() &lt; 20:
+        return self.roll()
+    self.hold()
+    return False</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.roll"><code class="name flex">
+<span>def <span class="ident">roll</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Roll the dice and evaluate result.</p>
+<p>Rolls the dice, evaluates and prints out result.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def roll(self):
+    &#34;&#34;&#34;
+    Roll the dice and evaluate result.
+
+    Rolls the dice, evaluates and prints out result.
+    &#34;&#34;&#34;
+    roll = self.roll_dice()
+    round_points = self.dice_holder.get_round_points()
+    total_points = self.dice_holder.get_total_points()
+    if roll == 1:
+        print(&#34;BinaryBrain has rolled a 1 and lost its round points.&#34;)
+        print(f&#34;\nTotal score: {total_points}\n&#34;)
+        return False
+    print(f&#34;BinaryBrain has rolled a {roll}.&#34;)
+    points = f&#34;Round score: {round_points}&#34;
+    score = f&#34;\nTotal score: {total_points}\n&#34;
+    print(points + score)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.roll_dice"><code class="name flex">
+<span>def <span class="ident">roll_dice</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>AI rolls the dice.</p>
+<p>Call the roll method on the dice object.
+Update the dicehand with the rolled number.
+Method returns the rolled number.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def roll_dice(self):
+    &#34;&#34;&#34;
+    AI rolls the dice.
+
+    Call the roll method on the dice object.
+    Update the dicehand with the rolled number.
+    Method returns the rolled number.
+    &#34;&#34;&#34;
+    dice = Dice()
+    roll_number = dice.roll()
+    self.dice_holder.update_hand(roll_number)
+    return roll_number</code></pre>
+</details>
+</dd>
+<dt id="intelligence.BinaryBrain.update_difficulty"><code class="name flex">
+<span>def <span class="ident">update_difficulty</span></span>(<span>self, difficulty)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the difficulty of the AI.</p>
+<p>Change the difficulty level according to the parameter.
+Can can range from 0-2, where 0 is the easiest difficulty.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_difficulty(self, difficulty):
+    &#34;&#34;&#34;
+    Set the difficulty of the AI.
+
+    Change the difficulty level according to the parameter.
+    Can can range from 0-2, where 0 is the easiest difficulty.
+    &#34;&#34;&#34;
+    self.difficulty = difficulty</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -45,6 +598,23 @@
 <ul></ul>
 </div>
 <ul id="index">
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="intelligence.BinaryBrain" href="#intelligence.BinaryBrain">BinaryBrain</a></code></h4>
+<ul class="two-column">
+<li><code><a title="intelligence.BinaryBrain.easy" href="#intelligence.BinaryBrain.easy">easy</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.evaluate_round" href="#intelligence.BinaryBrain.evaluate_round">evaluate_round</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.hard" href="#intelligence.BinaryBrain.hard">hard</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.hold" href="#intelligence.BinaryBrain.hold">hold</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.medium" href="#intelligence.BinaryBrain.medium">medium</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.roll" href="#intelligence.BinaryBrain.roll">roll</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.roll_dice" href="#intelligence.BinaryBrain.roll_dice">roll_dice</a></code></li>
+<li><code><a title="intelligence.BinaryBrain.update_difficulty" href="#intelligence.BinaryBrain.update_difficulty">update_difficulty</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </nav>
 </main>

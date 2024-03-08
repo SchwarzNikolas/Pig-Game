@@ -30,14 +30,15 @@
 <pre><code class="python">&#34;&#34;&#34;Module with commands for the player.&#34;&#34;&#34;
 
 from cmd import Cmd
-from pig_game import Game
+from game.pig_game import Game
+from game.intelligence import BinaryBrain
 
 
 class Output(Cmd):
     &#34;&#34;&#34;Class with methods to interact with the player.&#34;&#34;&#34;
 
     pink_pig_colour = &#34;\33[95m&#34;
-    welcome_colour = &#34;\33[43m&#34;
+    welcome_colour = &#34;\x1b[38;2;5;86;243m&#34;
     round_over_colour = &#34;\33[91m&#34;
     winning_colour = &#34;\33[92m&#34;
     keep_going_colour = &#34;\33[94m&#34;
@@ -59,26 +60,32 @@ class Output(Cmd):
         Player profile settings.
 
         Arguments:
-            -c: create Players  [profile -c John,Jane]
+            -c: create Players  [profile -c John, Jane]
             -r: rename Player   [profile -r John]
             -d: delete Player   [profile -d John]
         &#34;&#34;&#34;
         args = args.split()
+        args = [item.strip().strip(&#34;,&#34;) for item in args]
         if not args:
             print(&#34;No arguments given!&#34;)
             return
 
+        if self.game.game_state &gt; 0:
+            print(&#34;Can&#39;t modify profiles during an active game!&#34;)
+            return
+
         try:
+            playernames = args[1::]
             playername = args[1]
         except IndexError:
             if args[0] in [&#34;-d&#34;, &#34;-r&#34;, &#34;-c&#34;]:
                 print(&#34;No playername provided!&#34;)
             else:
-                print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)
+                print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)
         else:
             match args[0]:
                 case &#34;-c&#34;:
-                    self.game.create_player(playername.split(&#34;,&#34;))
+                    self.game.create_player(playernames)
                 case &#34;-r&#34;:
                     if self.game.rename_player(playername):
                         print(&#34;Playername sucessfully changed!&#34;)
@@ -90,11 +97,11 @@ class Output(Cmd):
                     else:
                         print(f&#34;Player {playername} doesn&#39;t exist.&#34;)
                 case _:
-                    print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)
+                    print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)
 
     def do_start(self, args):
         &#34;&#34;&#34;
-        Start a new game. Usage: &#34;start John Jane&#34;.
+        Start a new game. Usage: &#34;start John, Jane&#34;.
 
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
@@ -112,10 +119,91 @@ class Output(Cmd):
             print(err)
 
     def do_roll(self, _):
-        &#34;&#34;&#34;Roll the dice.&#34;&#34;&#34;
-        Cmd.prompt = &#34;(Player 1) &#34;
+        &#34;&#34;&#34;Roll the dice for the current player.&#34;&#34;&#34;
         msg = self.game.roll()
         print(msg)
+
+    def do_ai(self, args):
+        &#34;&#34;&#34;
+        Enable/Disable AI. Usage: &#34;ai true -medium / ai false.
+
+        After the ai keyword provide true or false to enable / disable the ai.
+        If the ai should be enabled,
+        set the difficulty level with the following arguments:
+        -e: easy AI     [ai true -e]
+        -m: medium AI   [ai true -m]
+        -h: hard AI     [ai true -h]
+        &#34;&#34;&#34;
+        if not args:
+            print(&#34;No arguments given!&#34;)
+            return
+
+        args = args.lower()
+        args = args.split()
+        try:
+            state = args[0]
+            difficulty = args[1]
+        except IndexError:
+            print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)
+        else:
+            match difficulty:
+                case &#34;-e&#34;:
+                    self.game.set_ai(state, 0)
+                case &#34;-m&#34;:
+                    self.game.set_ai(state, 1)
+                case &#34;-h&#34;:
+                    self.game.set_ai(state, 2)
+                case _:
+                    print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)
+
+    def do_hold(self, _):
+        &#34;&#34;&#34;Keep the round points.&#34;&#34;&#34;
+        msg = self.game.hold()
+        print(msg)
+
+    def do_quit(self, _):
+        &#34;&#34;&#34;Quit the current game.&#34;&#34;&#34;
+        self.game.quit()
+
+    def do_restart(self, _):
+        &#34;&#34;&#34;Restart a quit game.&#34;&#34;&#34;
+        self.game.restart()
+
+    def do_cheat(self, _):
+        &#34;&#34;&#34;Help the player to finish the game faster.&#34;&#34;&#34;
+        self.game.cheat()
+
+    def do_histogram(self, _):
+        &#34;&#34;&#34;Print out the stats of all saved players.&#34;&#34;&#34;
+        self.game.show_histogram()
+
+    def do_rules(self, _):
+        &#34;&#34;&#34;Print out the rules of the game.&#34;&#34;&#34;
+        with open(&#34;game/rules.txt&#34;, &#34;r&#34;, -1, &#34;utf-8&#34;) as file:
+            print(file.read())
+
+    def postcmd(self, stop, line):
+        &#34;&#34;&#34;
+        Set correct player after each action.
+
+        If the exit command is called the game will be closed.
+        Otherwise if a real player has entered a command it will display
+        the name of the next player.
+        If no game is active the default prompt will be displayed.
+        &#34;&#34;&#34;
+        index = self.game.game_state
+        if stop is True or &#34;exit&#34; in line:
+            return True
+        if index &gt;= 0:
+            if isinstance(self.game.active_players[index], BinaryBrain):
+                self.game.play_ai()
+                index = self.game.game_state
+            players = self.game.active_players
+            if players[self.game.game_state].player_name != &#34;BinaryBrain&#34;:
+                Cmd.prompt = f&#34;({players[index].player_name}) &#34;
+        else:
+            Cmd.prompt = &#34;(pig-game) &#34;
+        return False
 
     def do_exit(self, _):
         &#34;&#34;&#34;Exit the game.&#34;&#34;&#34;
@@ -147,7 +235,7 @@ class Output(Cmd):
     &#34;&#34;&#34;Class with methods to interact with the player.&#34;&#34;&#34;
 
     pink_pig_colour = &#34;\33[95m&#34;
-    welcome_colour = &#34;\33[43m&#34;
+    welcome_colour = &#34;\x1b[38;2;5;86;243m&#34;
     round_over_colour = &#34;\33[91m&#34;
     winning_colour = &#34;\33[92m&#34;
     keep_going_colour = &#34;\33[94m&#34;
@@ -169,26 +257,32 @@ class Output(Cmd):
         Player profile settings.
 
         Arguments:
-            -c: create Players  [profile -c John,Jane]
+            -c: create Players  [profile -c John, Jane]
             -r: rename Player   [profile -r John]
             -d: delete Player   [profile -d John]
         &#34;&#34;&#34;
         args = args.split()
+        args = [item.strip().strip(&#34;,&#34;) for item in args]
         if not args:
             print(&#34;No arguments given!&#34;)
             return
 
+        if self.game.game_state &gt; 0:
+            print(&#34;Can&#39;t modify profiles during an active game!&#34;)
+            return
+
         try:
+            playernames = args[1::]
             playername = args[1]
         except IndexError:
             if args[0] in [&#34;-d&#34;, &#34;-r&#34;, &#34;-c&#34;]:
                 print(&#34;No playername provided!&#34;)
             else:
-                print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)
+                print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)
         else:
             match args[0]:
                 case &#34;-c&#34;:
-                    self.game.create_player(playername.split(&#34;,&#34;))
+                    self.game.create_player(playernames)
                 case &#34;-r&#34;:
                     if self.game.rename_player(playername):
                         print(&#34;Playername sucessfully changed!&#34;)
@@ -200,11 +294,11 @@ class Output(Cmd):
                     else:
                         print(f&#34;Player {playername} doesn&#39;t exist.&#34;)
                 case _:
-                    print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)
+                    print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)
 
     def do_start(self, args):
         &#34;&#34;&#34;
-        Start a new game. Usage: &#34;start John Jane&#34;.
+        Start a new game. Usage: &#34;start John, Jane&#34;.
 
         After the start keyword provide playernames.
         If AI is enabled it will automatically join the game.
@@ -222,10 +316,91 @@ class Output(Cmd):
             print(err)
 
     def do_roll(self, _):
-        &#34;&#34;&#34;Roll the dice.&#34;&#34;&#34;
-        Cmd.prompt = &#34;(Player 1) &#34;
+        &#34;&#34;&#34;Roll the dice for the current player.&#34;&#34;&#34;
         msg = self.game.roll()
         print(msg)
+
+    def do_ai(self, args):
+        &#34;&#34;&#34;
+        Enable/Disable AI. Usage: &#34;ai true -medium / ai false.
+
+        After the ai keyword provide true or false to enable / disable the ai.
+        If the ai should be enabled,
+        set the difficulty level with the following arguments:
+        -e: easy AI     [ai true -e]
+        -m: medium AI   [ai true -m]
+        -h: hard AI     [ai true -h]
+        &#34;&#34;&#34;
+        if not args:
+            print(&#34;No arguments given!&#34;)
+            return
+
+        args = args.lower()
+        args = args.split()
+        try:
+            state = args[0]
+            difficulty = args[1]
+        except IndexError:
+            print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)
+        else:
+            match difficulty:
+                case &#34;-e&#34;:
+                    self.game.set_ai(state, 0)
+                case &#34;-m&#34;:
+                    self.game.set_ai(state, 1)
+                case &#34;-h&#34;:
+                    self.game.set_ai(state, 2)
+                case _:
+                    print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)
+
+    def do_hold(self, _):
+        &#34;&#34;&#34;Keep the round points.&#34;&#34;&#34;
+        msg = self.game.hold()
+        print(msg)
+
+    def do_quit(self, _):
+        &#34;&#34;&#34;Quit the current game.&#34;&#34;&#34;
+        self.game.quit()
+
+    def do_restart(self, _):
+        &#34;&#34;&#34;Restart a quit game.&#34;&#34;&#34;
+        self.game.restart()
+
+    def do_cheat(self, _):
+        &#34;&#34;&#34;Help the player to finish the game faster.&#34;&#34;&#34;
+        self.game.cheat()
+
+    def do_histogram(self, _):
+        &#34;&#34;&#34;Print out the stats of all saved players.&#34;&#34;&#34;
+        self.game.show_histogram()
+
+    def do_rules(self, _):
+        &#34;&#34;&#34;Print out the rules of the game.&#34;&#34;&#34;
+        with open(&#34;game/rules.txt&#34;, &#34;r&#34;, -1, &#34;utf-8&#34;) as file:
+            print(file.read())
+
+    def postcmd(self, stop, line):
+        &#34;&#34;&#34;
+        Set correct player after each action.
+
+        If the exit command is called the game will be closed.
+        Otherwise if a real player has entered a command it will display
+        the name of the next player.
+        If no game is active the default prompt will be displayed.
+        &#34;&#34;&#34;
+        index = self.game.game_state
+        if stop is True or &#34;exit&#34; in line:
+            return True
+        if index &gt;= 0:
+            if isinstance(self.game.active_players[index], BinaryBrain):
+                self.game.play_ai()
+                index = self.game.game_state
+            players = self.game.active_players
+            if players[self.game.game_state].player_name != &#34;BinaryBrain&#34;:
+                Cmd.prompt = f&#34;({players[index].player_name}) &#34;
+        else:
+            Cmd.prompt = &#34;(pig-game) &#34;
+        return False
 
     def do_exit(self, _):
         &#34;&#34;&#34;Exit the game.&#34;&#34;&#34;
@@ -282,6 +457,72 @@ class Output(Cmd):
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="output.Output.do_ai"><code class="name flex">
+<span>def <span class="ident">do_ai</span></span>(<span>self, args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable/Disable AI. Usage: "ai true -medium / ai false.</p>
+<p>After the ai keyword provide true or false to enable / disable the ai.
+If the ai should be enabled,
+set the difficulty level with the following arguments:
+-e: easy AI
+[ai true -e]
+-m: medium AI
+[ai true -m]
+-h: hard AI
+[ai true -h]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_ai(self, args):
+    &#34;&#34;&#34;
+    Enable/Disable AI. Usage: &#34;ai true -medium / ai false.
+
+    After the ai keyword provide true or false to enable / disable the ai.
+    If the ai should be enabled,
+    set the difficulty level with the following arguments:
+    -e: easy AI     [ai true -e]
+    -m: medium AI   [ai true -m]
+    -h: hard AI     [ai true -h]
+    &#34;&#34;&#34;
+    if not args:
+        print(&#34;No arguments given!&#34;)
+        return
+
+    args = args.lower()
+    args = args.split()
+    try:
+        state = args[0]
+        difficulty = args[1]
+    except IndexError:
+        print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)
+    else:
+        match difficulty:
+            case &#34;-e&#34;:
+                self.game.set_ai(state, 0)
+            case &#34;-m&#34;:
+                self.game.set_ai(state, 1)
+            case &#34;-h&#34;:
+                self.game.set_ai(state, 2)
+            case _:
+                print(&#39;Garbage argument. Use &#34;help ai&#34;.&#39;)</code></pre>
+</details>
+</dd>
+<dt id="output.Output.do_cheat"><code class="name flex">
+<span>def <span class="ident">do_cheat</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Help the player to finish the game faster.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_cheat(self, _):
+    &#34;&#34;&#34;Help the player to finish the game faster.&#34;&#34;&#34;
+    self.game.cheat()</code></pre>
+</details>
+</dd>
 <dt id="output.Output.do_exit"><code class="name flex">
 <span>def <span class="ident">do_exit</span></span>(<span>self, _)</span>
 </code></dt>
@@ -298,6 +539,35 @@ class Output(Cmd):
     return True</code></pre>
 </details>
 </dd>
+<dt id="output.Output.do_histogram"><code class="name flex">
+<span>def <span class="ident">do_histogram</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Print out the stats of all saved players.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_histogram(self, _):
+    &#34;&#34;&#34;Print out the stats of all saved players.&#34;&#34;&#34;
+    self.game.show_histogram()</code></pre>
+</details>
+</dd>
+<dt id="output.Output.do_hold"><code class="name flex">
+<span>def <span class="ident">do_hold</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Keep the round points.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_hold(self, _):
+    &#34;&#34;&#34;Keep the round points.&#34;&#34;&#34;
+    msg = self.game.hold()
+    print(msg)</code></pre>
+</details>
+</dd>
 <dt id="output.Output.do_profile"><code class="name flex">
 <span>def <span class="ident">do_profile</span></span>(<span>self, args)</span>
 </code></dt>
@@ -305,7 +575,7 @@ class Output(Cmd):
 <div class="desc"><p>Player profile settings.</p>
 <h2 id="arguments">Arguments</h2>
 <p>-c: create Players
-[profile -c John,Jane]
+[profile -c John, Jane]
 -r: rename Player
 [profile -r John]
 -d: delete Player
@@ -319,26 +589,32 @@ class Output(Cmd):
     Player profile settings.
 
     Arguments:
-        -c: create Players  [profile -c John,Jane]
+        -c: create Players  [profile -c John, Jane]
         -r: rename Player   [profile -r John]
         -d: delete Player   [profile -d John]
     &#34;&#34;&#34;
     args = args.split()
+    args = [item.strip().strip(&#34;,&#34;) for item in args]
     if not args:
         print(&#34;No arguments given!&#34;)
         return
 
+    if self.game.game_state &gt; 0:
+        print(&#34;Can&#39;t modify profiles during an active game!&#34;)
+        return
+
     try:
+        playernames = args[1::]
         playername = args[1]
     except IndexError:
         if args[0] in [&#34;-d&#34;, &#34;-r&#34;, &#34;-c&#34;]:
             print(&#34;No playername provided!&#34;)
         else:
-            print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)
+            print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)
     else:
         match args[0]:
             case &#34;-c&#34;:
-                self.game.create_player(playername.split(&#34;,&#34;))
+                self.game.create_player(playernames)
             case &#34;-r&#34;:
                 if self.game.rename_player(playername):
                     print(&#34;Playername sucessfully changed!&#34;)
@@ -350,30 +626,72 @@ class Output(Cmd):
                 else:
                     print(f&#34;Player {playername} doesn&#39;t exist.&#34;)
             case _:
-                print(&#34;Garbage argument. Use \&#34;help profile\&#34;.&#34;)</code></pre>
+                print(&#39;Garbage argument. Use &#34;help profile&#34;.&#39;)</code></pre>
+</details>
+</dd>
+<dt id="output.Output.do_quit"><code class="name flex">
+<span>def <span class="ident">do_quit</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Quit the current game.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_quit(self, _):
+    &#34;&#34;&#34;Quit the current game.&#34;&#34;&#34;
+    self.game.quit()</code></pre>
+</details>
+</dd>
+<dt id="output.Output.do_restart"><code class="name flex">
+<span>def <span class="ident">do_restart</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Restart a quit game.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_restart(self, _):
+    &#34;&#34;&#34;Restart a quit game.&#34;&#34;&#34;
+    self.game.restart()</code></pre>
 </details>
 </dd>
 <dt id="output.Output.do_roll"><code class="name flex">
 <span>def <span class="ident">do_roll</span></span>(<span>self, _)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Roll the dice.</p></div>
+<div class="desc"><p>Roll the dice for the current player.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def do_roll(self, _):
-    &#34;&#34;&#34;Roll the dice.&#34;&#34;&#34;
-    Cmd.prompt = &#34;(Player 1) &#34;
+    &#34;&#34;&#34;Roll the dice for the current player.&#34;&#34;&#34;
     msg = self.game.roll()
     print(msg)</code></pre>
+</details>
+</dd>
+<dt id="output.Output.do_rules"><code class="name flex">
+<span>def <span class="ident">do_rules</span></span>(<span>self, _)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Print out the rules of the game.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def do_rules(self, _):
+    &#34;&#34;&#34;Print out the rules of the game.&#34;&#34;&#34;
+    with open(&#34;game/rules.txt&#34;, &#34;r&#34;, -1, &#34;utf-8&#34;) as file:
+        print(file.read())</code></pre>
 </details>
 </dd>
 <dt id="output.Output.do_start"><code class="name flex">
 <span>def <span class="ident">do_start</span></span>(<span>self, args)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Start a new game. Usage: "start John Jane".</p>
+<div class="desc"><p>Start a new game. Usage: "start John, Jane".</p>
 <p>After the start keyword provide playernames.
 If AI is enabled it will automatically join the game.</p></div>
 <details class="source">
@@ -382,7 +700,7 @@ If AI is enabled it will automatically join the game.</p></div>
 </summary>
 <pre><code class="python">def do_start(self, args):
     &#34;&#34;&#34;
-    Start a new game. Usage: &#34;start John Jane&#34;.
+    Start a new game. Usage: &#34;start John, Jane&#34;.
 
     After the start keyword provide playernames.
     If AI is enabled it will automatically join the game.
@@ -398,6 +716,43 @@ If AI is enabled it will automatically join the game.</p></div>
             Cmd.prompt = f&#34;({first_player.player_name}) &#34;
     except (ValueError, TypeError) as err:
         print(err)</code></pre>
+</details>
+</dd>
+<dt id="output.Output.postcmd"><code class="name flex">
+<span>def <span class="ident">postcmd</span></span>(<span>self, stop, line)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set correct player after each action.</p>
+<p>If the exit command is called the game will be closed.
+Otherwise if a real player has entered a command it will display
+the name of the next player.
+If no game is active the default prompt will be displayed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def postcmd(self, stop, line):
+    &#34;&#34;&#34;
+    Set correct player after each action.
+
+    If the exit command is called the game will be closed.
+    Otherwise if a real player has entered a command it will display
+    the name of the next player.
+    If no game is active the default prompt will be displayed.
+    &#34;&#34;&#34;
+    index = self.game.game_state
+    if stop is True or &#34;exit&#34; in line:
+        return True
+    if index &gt;= 0:
+        if isinstance(self.game.active_players[index], BinaryBrain):
+            self.game.play_ai()
+            index = self.game.game_state
+        players = self.game.active_players
+        if players[self.game.game_state].player_name != &#34;BinaryBrain&#34;:
+            Cmd.prompt = f&#34;({players[index].player_name}) &#34;
+    else:
+        Cmd.prompt = &#34;(pig-game) &#34;
+    return False</code></pre>
 </details>
 </dd>
 </dl>
@@ -417,9 +772,16 @@ If AI is enabled it will automatically join the game.</p></div>
 <h4><code><a title="output.Output" href="#output.Output">Output</a></code></h4>
 <ul class="two-column">
 <li><code><a title="output.Output.completekey" href="#output.Output.completekey">completekey</a></code></li>
+<li><code><a title="output.Output.do_ai" href="#output.Output.do_ai">do_ai</a></code></li>
+<li><code><a title="output.Output.do_cheat" href="#output.Output.do_cheat">do_cheat</a></code></li>
 <li><code><a title="output.Output.do_exit" href="#output.Output.do_exit">do_exit</a></code></li>
+<li><code><a title="output.Output.do_histogram" href="#output.Output.do_histogram">do_histogram</a></code></li>
+<li><code><a title="output.Output.do_hold" href="#output.Output.do_hold">do_hold</a></code></li>
 <li><code><a title="output.Output.do_profile" href="#output.Output.do_profile">do_profile</a></code></li>
+<li><code><a title="output.Output.do_quit" href="#output.Output.do_quit">do_quit</a></code></li>
+<li><code><a title="output.Output.do_restart" href="#output.Output.do_restart">do_restart</a></code></li>
 <li><code><a title="output.Output.do_roll" href="#output.Output.do_roll">do_roll</a></code></li>
+<li><code><a title="output.Output.do_rules" href="#output.Output.do_rules">do_rules</a></code></li>
 <li><code><a title="output.Output.do_start" href="#output.Output.do_start">do_start</a></code></li>
 <li><code><a title="output.Output.end_colour" href="#output.Output.end_colour">end_colour</a></code></li>
 <li><code><a title="output.Output.flashing_effect" href="#output.Output.flashing_effect">flashing_effect</a></code></li>
@@ -427,6 +789,7 @@ If AI is enabled it will automatically join the game.</p></div>
 <li><code><a title="output.Output.italics" href="#output.Output.italics">italics</a></code></li>
 <li><code><a title="output.Output.keep_going_colour" href="#output.Output.keep_going_colour">keep_going_colour</a></code></li>
 <li><code><a title="output.Output.pink_pig_colour" href="#output.Output.pink_pig_colour">pink_pig_colour</a></code></li>
+<li><code><a title="output.Output.postcmd" href="#output.Output.postcmd">postcmd</a></code></li>
 <li><code><a title="output.Output.round_over_colour" href="#output.Output.round_over_colour">round_over_colour</a></code></li>
 <li><code><a title="output.Output.welcome_colour" href="#output.Output.welcome_colour">welcome_colour</a></code></li>
 <li><code><a title="output.Output.winning_colour" href="#output.Output.winning_colour">winning_colour</a></code></li>

@@ -29,36 +29,52 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34;The Module with the Player blueprint.&#34;&#34;&#34;
 
-from dice import Dice
-from dicehand import DiceHand
+from game.dice import Dice
+from game.dicehand import DiceHand
+from game.highscore import Highscore
 
 
 class Player:
-    &#34;&#34;&#34;The Blueprint for a Player.&#34;&#34;&#34;
+    &#34;&#34;&#34;Blueprint for a Player.&#34;&#34;&#34;
 
     def __init__(self, player_name):
-        &#34;&#34;&#34;Beginning of a New Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Beginning of a new Player.&#34;&#34;&#34;
         self.player_name = player_name
-        self.highscore_least_rolls = 0
-        self.highscore_least_rounds = 0
+        self.dice_holder = DiceHand()
+        self.highscores = Highscore()
 
     def reset_player_stats(self):
-        &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Beginning for an existing Player.&#34;&#34;&#34;
         confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
         confirmation.lower()
         if confirmation == &#34;y&#34;:
-            self.highscore_least_rolls = 0
-            self.highscore_least_rounds = 0
+            self.highscores.reset_highscore()
 
     def change_name(self):
-        &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Alter the identity of the Player.&#34;&#34;&#34;
         self.player_name = input(&#34;Please enter your new player name: &#34;)
 
     def roll_dice(self):
-        &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;
+        &#34;&#34;&#34;Decides fate.&#34;&#34;&#34;
+        dice = Dice()
+        roll_number = dice.roll()
+        self.dice_holder.update_hand(roll_number)
+        return roll_number
 
     def return_stats(self):
-        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
+        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;
+        lowest_roll, lowest_round = self.highscores.return_low_stats()
+        highest_points = self.highscores.return_high_stats()
+        all_time_points, wins = self.highscores.return_all_time_stats()
+        return lowest_roll, lowest_round, highest_points, all_time_points, wins
+
+    def update_scores(self, win):
+        &#34;&#34;&#34;Update museum after finished game.&#34;&#34;&#34;
+        rolls = self.dice_holder.get_amount_of_rolls()
+        rounds = self.dice_holder.get_rounds()
+        points = self.dice_holder.get_total_points()
+
+        self.highscores.update_highscore(rolls, rounds, points, win)</code></pre>
 </details>
 </section>
 <section>
@@ -75,38 +91,53 @@ class Player:
 <span>(</span><span>player_name)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The Blueprint for a Player.</p>
-<p>Beginning of a New Player.</p></div>
+<div class="desc"><p>Blueprint for a Player.</p>
+<p>Beginning of a new Player.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Player:
-    &#34;&#34;&#34;The Blueprint for a Player.&#34;&#34;&#34;
+    &#34;&#34;&#34;Blueprint for a Player.&#34;&#34;&#34;
 
     def __init__(self, player_name):
-        &#34;&#34;&#34;Beginning of a New Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Beginning of a new Player.&#34;&#34;&#34;
         self.player_name = player_name
-        self.highscore_least_rolls = 0
-        self.highscore_least_rounds = 0
+        self.dice_holder = DiceHand()
+        self.highscores = Highscore()
 
     def reset_player_stats(self):
-        &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Beginning for an existing Player.&#34;&#34;&#34;
         confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
         confirmation.lower()
         if confirmation == &#34;y&#34;:
-            self.highscore_least_rolls = 0
-            self.highscore_least_rounds = 0
+            self.highscores.reset_highscore()
 
     def change_name(self):
-        &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+        &#34;&#34;&#34;Alter the identity of the Player.&#34;&#34;&#34;
         self.player_name = input(&#34;Please enter your new player name: &#34;)
 
     def roll_dice(self):
-        &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;
+        &#34;&#34;&#34;Decides fate.&#34;&#34;&#34;
+        dice = Dice()
+        roll_number = dice.roll()
+        self.dice_holder.update_hand(roll_number)
+        return roll_number
 
     def return_stats(self):
-        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
+        &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;
+        lowest_roll, lowest_round = self.highscores.return_low_stats()
+        highest_points = self.highscores.return_high_stats()
+        all_time_points, wins = self.highscores.return_all_time_stats()
+        return lowest_roll, lowest_round, highest_points, all_time_points, wins
+
+    def update_scores(self, win):
+        &#34;&#34;&#34;Update museum after finished game.&#34;&#34;&#34;
+        rolls = self.dice_holder.get_amount_of_rolls()
+        rounds = self.dice_holder.get_rounds()
+        points = self.dice_holder.get_total_points()
+
+        self.highscores.update_highscore(rolls, rounds, points, win)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -114,13 +145,13 @@ class Player:
 <span>def <span class="ident">change_name</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Alter the Identity of the Player.</p></div>
+<div class="desc"><p>Alter the identity of the Player.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def change_name(self):
-    &#34;&#34;&#34;Alter the Identity of the Player.&#34;&#34;&#34;
+    &#34;&#34;&#34;Alter the identity of the Player.&#34;&#34;&#34;
     self.player_name = input(&#34;Please enter your new player name: &#34;)</code></pre>
 </details>
 </dd>
@@ -128,18 +159,17 @@ class Player:
 <span>def <span class="ident">reset_player_stats</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Beginning for an Existing Player.</p></div>
+<div class="desc"><p>Beginning for an existing Player.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset_player_stats(self):
-    &#34;&#34;&#34;Beginning for an Existing Player.&#34;&#34;&#34;
+    &#34;&#34;&#34;Beginning for an existing Player.&#34;&#34;&#34;
     confirmation = input(&#34;Proceed with Reset? [y/N] &#34;)
     confirmation.lower()
     if confirmation == &#34;y&#34;:
-        self.highscore_least_rolls = 0
-        self.highscore_least_rounds = 0</code></pre>
+        self.highscores.reset_highscore()</code></pre>
 </details>
 </dd>
 <dt id="player.Player.return_stats"><code class="name flex">
@@ -152,20 +182,46 @@ class Player:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def return_stats(self):
-    &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;Museum of your previous games.&#34;&#34;&#34;
+    lowest_roll, lowest_round = self.highscores.return_low_stats()
+    highest_points = self.highscores.return_high_stats()
+    all_time_points, wins = self.highscores.return_all_time_stats()
+    return lowest_roll, lowest_round, highest_points, all_time_points, wins</code></pre>
 </details>
 </dd>
 <dt id="player.Player.roll_dice"><code class="name flex">
 <span>def <span class="ident">roll_dice</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Decides Fate.</p></div>
+<div class="desc"><p>Decides fate.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def roll_dice(self):
-    &#34;&#34;&#34;Decides Fate.&#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;Decides fate.&#34;&#34;&#34;
+    dice = Dice()
+    roll_number = dice.roll()
+    self.dice_holder.update_hand(roll_number)
+    return roll_number</code></pre>
+</details>
+</dd>
+<dt id="player.Player.update_scores"><code class="name flex">
+<span>def <span class="ident">update_scores</span></span>(<span>self, win)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update museum after finished game.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_scores(self, win):
+    &#34;&#34;&#34;Update museum after finished game.&#34;&#34;&#34;
+    rolls = self.dice_holder.get_amount_of_rolls()
+    rounds = self.dice_holder.get_rounds()
+    points = self.dice_holder.get_total_points()
+
+    self.highscores.update_highscore(rolls, rounds, points, win)</code></pre>
 </details>
 </dd>
 </dl>
@@ -188,6 +244,7 @@ class Player:
 <li><code><a title="player.Player.reset_player_stats" href="#player.Player.reset_player_stats">reset_player_stats</a></code></li>
 <li><code><a title="player.Player.return_stats" href="#player.Player.return_stats">return_stats</a></code></li>
 <li><code><a title="player.Player.roll_dice" href="#player.Player.roll_dice">roll_dice</a></code></li>
+<li><code><a title="player.Player.update_scores" href="#player.Player.update_scores">update_scores</a></code></li>
 </ul>
 </li>
 </ul>

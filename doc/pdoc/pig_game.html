@@ -30,15 +30,31 @@
 <pre><code class="python">&#34;&#34;&#34;Module with the game logic.&#34;&#34;&#34;
 
 import pickle
-from player import Player
-from dice import Dice
+from game.player import Player
+from game.intelligence import BinaryBrain
+from game.histogram import Histogram
 
 
 class Game:
-    &#34;&#34;&#34;Pig-Game Class.&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Pig-Game Class.
+
+    This class holds the game logic.
+    It holds the playerdata aswell as the AI.
+    &#34;&#34;&#34;
 
     def __init__(self):
-        &#34;&#34;&#34;Initialize Object.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Initialize Object.
+
+        self.players holds all the saved players with their stats.
+        self.active_players holds all the players of an active game.
+        self.gamestate indicates if a game is active and whoes turn it is.
+        self.amount_players stores the amount of active players in a round.
+        self.ai is the object of the pig-game AI.
+        self.saved_game saves the state of an ongoing game if the user quits.
+        self.cheated_game indicates if someone used the cheat command.
+        &#34;&#34;&#34;
         self.players = []
         try:
             with open(&#34;players.dat&#34;, &#34;rb&#34;) as file:
@@ -48,31 +64,56 @@ class Game:
         self.active_players = []
         self.game_state = -1
         self.amount_players = 0
-        self.dice = Dice()
+        self.ai = BinaryBrain()
+        self.active_ai = 0
+        self.save_game = 0
+        self.cheated_game = 0
 
     def start(self, args):
-        &#34;&#34;&#34;Start a new game.&#34;&#34;&#34;
-        player_names = args.split()
+        &#34;&#34;&#34;
+        Start a new game.
+
+        Checks how many players will join the game,
+        will enable AI if only 1 player joins.
+        After the amount of players is checked all provided players
+        will be moved into the active player list.
+        If everything is sucessfull the gamestate will be set to 0.
+        &#34;&#34;&#34;
+        player_names = args.split(&#34;,&#34;)
         if len(player_names) &gt; 6 or len(player_names) &lt; 1:
             raise ValueError(&#34;The amount of players must be between 1 and 6.&#34;)
-        self.amount_players = len(player_names)
+        if len(player_names) == 1:
+            self.active_ai = 1
+            print(&#34;AI will join this game!&#34;)
 
+        self.active_players = []
+        self.ai.dice_holder.reset()
         for name in player_names:
             player_exists = False
             for player in self.players:
-                if player.player_name == name:
+                if player.player_name == name.strip():
                     player_exists = True
+                    player.dice_holder.reset()
                     self.active_players.append(player)
+                    if self.active_ai == 1:
+                        self.active_ai = 2
+                        self.active_players.append(self.ai)
                     break
             if not player_exists:
-                print(f&#34;Player {name} doesnt have a profile yet!&#34;)
+                print(f&#34;Player {name.strip()} doesnt have a profile yet!&#34;)
                 return False
 
         self.game_state = 0
+        self.amount_players = len(self.active_players)
         return self.active_players[0]
 
     def create_player(self, names):
-        &#34;&#34;&#34;Create players with a list of names.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Create a new player object.
+
+        Loops through a list of player names.
+        Create a new player is the given name isn&#39;t taken.
+        &#34;&#34;&#34;
         for name in names:
             taken = 0
             if len(self.players) &gt; 0:
@@ -86,6 +127,7 @@ class Game:
                 print(f&#34;Player {name} has been created!&#34;)
 
     def rename_player(self, name):
+        &#34;&#34;&#34;Rename player&#39;s object.&#34;&#34;&#34;
         for player in self.players:
             if player.player_name == name:
                 player.change_name()
@@ -93,6 +135,12 @@ class Game:
         return False
 
     def delete_player(self, name):
+        &#34;&#34;&#34;
+        Delete player from list.
+
+        Delete the player object from the player list if the name matches.
+        Needs confirmation before deleting.
+        &#34;&#34;&#34;
         for player in self.players:
             if player.player_name == name:
                 confirm = input(f&#34;Proceed with deleting Player {name}? [y/N] &#34;)
@@ -103,18 +151,144 @@ class Game:
         return False
 
     def roll(self):
-        &#34;&#34;&#34;Player decides to roll the dice.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Player decides to roll the dice.
+
+        Select the active player and use the roll_dice method.
+        The player returns the result of the roll.
+        If a 1 is rolled, the active player will change and then
+        the round score will be printed.
+        If something else is rolled, the stats will be printed
+        and the player may continue to roll.
+        &#34;&#34;&#34;
+        msg = &#34;No active game!&#34;
         if self.game_state &lt; 0:
-            return &#34;No active game!&#34;
-        dice = Dice()
-        dice_num = dice.roll()
-        if dice_num == 1:
-            return f&#34;{self.players[self.game_state].name}\
-has rolled a 1 and lost all points this round.&#34;
-        return f&#34;{self.players[self.game_state].name} has rolled a {dice_num}.&#34;
+            return msg
+        roll = self.active_players[self.game_state].roll_dice()
+        if roll == 1:
+            self.game_state = (self.game_state + 1) % self.amount_players
+            player = self.active_players[self.game_state - 1]
+            name = f&#34;\n{player.player_name}&#34;
+            string = &#34; has rolled a 1 and lost all points this round.\n&#34;
+            score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}&#34;
+            points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+            return name + string + points + score
+        player = self.active_players[self.game_state]
+        name = f&#34;\n{player.player_name}&#34;
+        string = f&#34; has rolled a {roll}&#34;
+        points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+        score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}\n&#34;
+        return name + string + points + score
+
+    def hold(self):
+        &#34;&#34;&#34;
+        Player decides to hold the round points.
+
+        If a player decides to hold the round points
+        will be added to the total points. Afterwards the game evaluates
+        if the totalscore is higher or equal to 100 points.
+        If thats the case the game ends and the current player wins.
+        &#34;&#34;&#34;
+        msg = &#34;No active game!&#34;
+        if self.game_state &lt; 0:
+            return msg
+        player = self.active_players[self.game_state]
+        player.dice_holder.hold()
+        if player.dice_holder.get_total_points() &gt;= 100:
+            self.game_state = -1
+            self.active_ai = 0
+            if self.cheated_game == 0:
+                player.update_scores(1)
+            return f&#34;{player.player_name} has won the game!&#34;
+        self.game_state = (self.game_state + 1) % self.amount_players
+        name = f&#34;\n{player.player_name}&#39;s total points are now: &#34;
+        score = f&#34;{player.dice_holder.get_total_points()}\n&#34;
+        return name + score
+
+    def set_ai(self, state, difficulty):
+        &#34;&#34;&#34;
+        Enable the AI.
+
+        If the state parameter quals to ture the ai will be enabled
+        and the difficulty will be set.
+        Otherwise the ai will be disabled.
+        &#34;&#34;&#34;
+        if state == &#34;true&#34;:
+            self.active_ai = 1
+            self.ai.update_difficulty(difficulty)
+            print(&#34;AI will join the next game!&#34;)
+        else:
+            self.active_ai = 0
+            print(&#34;AI is disabled for the next game!&#34;)
+
+    def play_ai(self):
+        &#34;&#34;&#34;
+        Let the AI do its moves.
+
+        Calls the game loop of the AI.
+        Afterwards a check runs if the AI has won the game.
+        &#34;&#34;&#34;
+        self.ai.evaluate_round()
+        player = self.ai
+        if player.dice_holder.get_total_points() &gt;= 100:
+            self.game_state = -1
+            print(f&#34;{player.player_name} has won the game!&#34;)
+            print(&#34;Type quit to leave the current game.&#34;)
+            self.active_ai = 0
+            return
+        self.game_state = (self.game_state + 1) % self.amount_players
+
+    def quit(self):
+        &#34;&#34;&#34;
+        Pause/Quit current game.
+
+        If a game is currently active it will be paused
+        and the gamestate will be saved.
+        &#34;&#34;&#34;
+        if self.game_state &gt;= 0:
+            self.save_game = self.game_state
+            self.game_state = -1
+
+    def cheat(self):
+        &#34;&#34;&#34;
+        Help a player to win faster.
+
+        Set the current players points to 99.
+        &#34;&#34;&#34;
+        self.cheated_game = 1
+        self.active_players[self.game_state].dice_holder.totalpoints = 99
+        print(&#34;You cheated!\nYour total points are set to 99.&#34;)
+
+    def restart(self):
+        &#34;&#34;&#34;
+        Restart paused game.
+
+        If a running game has been quit it will be restarted
+        and the saved data will be loaded.
+        &#34;&#34;&#34;
+        if self.save_game &gt; 0:
+            self.game_state = self.save_game
+        else:
+            print(&#34;There is no paused game!&#34;)
+
+    def show_histogram(self):
+        &#34;&#34;&#34;
+        Show all players stats.
+
+        Prints out charts about each players stats.
+        Returns true if histogram is displayed sucessfully.
+        &#34;&#34;&#34;
+        histogram = Histogram()
+        histogram.display(self.players)
+        return True
 
     def exit(self):
-        &#34;&#34;&#34;Save players and exit&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Save players and exit.
+
+        Method will be called when the user exits the program,
+        The playerlist will be saved as a binary file.
+        &#34;&#34;&#34;
         with open(&#34;players.dat&#34;, &#34;wb&#34;) as file:
             pickle.dump(self.players, file)
         return &#34;Thank you for playing!&#34;</code></pre>
@@ -134,16 +308,40 @@ has rolled a 1 and lost all points this round.&#34;
 </code></dt>
 <dd>
 <div class="desc"><p>Pig-Game Class.</p>
-<p>Initialize Object.</p></div>
+<p>This class holds the game logic.
+It holds the playerdata aswell as the AI.</p>
+<p>Initialize Object.</p>
+<p>self.players holds all the saved players with their stats.
+self.active_players holds all the players of an active game.
+self.gamestate indicates if a game is active and whoes turn it is.
+self.amount_players stores the amount of active players in a round.
+self.ai is the object of the pig-game AI.
+self.saved_game saves the state of an ongoing game if the user quits.
+self.cheated_game indicates if someone used the cheat command.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Game:
-    &#34;&#34;&#34;Pig-Game Class.&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Pig-Game Class.
+
+    This class holds the game logic.
+    It holds the playerdata aswell as the AI.
+    &#34;&#34;&#34;
 
     def __init__(self):
-        &#34;&#34;&#34;Initialize Object.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Initialize Object.
+
+        self.players holds all the saved players with their stats.
+        self.active_players holds all the players of an active game.
+        self.gamestate indicates if a game is active and whoes turn it is.
+        self.amount_players stores the amount of active players in a round.
+        self.ai is the object of the pig-game AI.
+        self.saved_game saves the state of an ongoing game if the user quits.
+        self.cheated_game indicates if someone used the cheat command.
+        &#34;&#34;&#34;
         self.players = []
         try:
             with open(&#34;players.dat&#34;, &#34;rb&#34;) as file:
@@ -153,31 +351,56 @@ has rolled a 1 and lost all points this round.&#34;
         self.active_players = []
         self.game_state = -1
         self.amount_players = 0
-        self.dice = Dice()
+        self.ai = BinaryBrain()
+        self.active_ai = 0
+        self.save_game = 0
+        self.cheated_game = 0
 
     def start(self, args):
-        &#34;&#34;&#34;Start a new game.&#34;&#34;&#34;
-        player_names = args.split()
+        &#34;&#34;&#34;
+        Start a new game.
+
+        Checks how many players will join the game,
+        will enable AI if only 1 player joins.
+        After the amount of players is checked all provided players
+        will be moved into the active player list.
+        If everything is sucessfull the gamestate will be set to 0.
+        &#34;&#34;&#34;
+        player_names = args.split(&#34;,&#34;)
         if len(player_names) &gt; 6 or len(player_names) &lt; 1:
             raise ValueError(&#34;The amount of players must be between 1 and 6.&#34;)
-        self.amount_players = len(player_names)
+        if len(player_names) == 1:
+            self.active_ai = 1
+            print(&#34;AI will join this game!&#34;)
 
+        self.active_players = []
+        self.ai.dice_holder.reset()
         for name in player_names:
             player_exists = False
             for player in self.players:
-                if player.player_name == name:
+                if player.player_name == name.strip():
                     player_exists = True
+                    player.dice_holder.reset()
                     self.active_players.append(player)
+                    if self.active_ai == 1:
+                        self.active_ai = 2
+                        self.active_players.append(self.ai)
                     break
             if not player_exists:
-                print(f&#34;Player {name} doesnt have a profile yet!&#34;)
+                print(f&#34;Player {name.strip()} doesnt have a profile yet!&#34;)
                 return False
 
         self.game_state = 0
+        self.amount_players = len(self.active_players)
         return self.active_players[0]
 
     def create_player(self, names):
-        &#34;&#34;&#34;Create players with a list of names.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Create a new player object.
+
+        Loops through a list of player names.
+        Create a new player is the given name isn&#39;t taken.
+        &#34;&#34;&#34;
         for name in names:
             taken = 0
             if len(self.players) &gt; 0:
@@ -191,6 +414,7 @@ has rolled a 1 and lost all points this round.&#34;
                 print(f&#34;Player {name} has been created!&#34;)
 
     def rename_player(self, name):
+        &#34;&#34;&#34;Rename player&#39;s object.&#34;&#34;&#34;
         for player in self.players:
             if player.player_name == name:
                 player.change_name()
@@ -198,6 +422,12 @@ has rolled a 1 and lost all points this round.&#34;
         return False
 
     def delete_player(self, name):
+        &#34;&#34;&#34;
+        Delete player from list.
+
+        Delete the player object from the player list if the name matches.
+        Needs confirmation before deleting.
+        &#34;&#34;&#34;
         for player in self.players:
             if player.player_name == name:
                 confirm = input(f&#34;Proceed with deleting Player {name}? [y/N] &#34;)
@@ -208,35 +438,189 @@ has rolled a 1 and lost all points this round.&#34;
         return False
 
     def roll(self):
-        &#34;&#34;&#34;Player decides to roll the dice.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Player decides to roll the dice.
+
+        Select the active player and use the roll_dice method.
+        The player returns the result of the roll.
+        If a 1 is rolled, the active player will change and then
+        the round score will be printed.
+        If something else is rolled, the stats will be printed
+        and the player may continue to roll.
+        &#34;&#34;&#34;
+        msg = &#34;No active game!&#34;
         if self.game_state &lt; 0:
-            return &#34;No active game!&#34;
-        dice = Dice()
-        dice_num = dice.roll()
-        if dice_num == 1:
-            return f&#34;{self.players[self.game_state].name}\
-has rolled a 1 and lost all points this round.&#34;
-        return f&#34;{self.players[self.game_state].name} has rolled a {dice_num}.&#34;
+            return msg
+        roll = self.active_players[self.game_state].roll_dice()
+        if roll == 1:
+            self.game_state = (self.game_state + 1) % self.amount_players
+            player = self.active_players[self.game_state - 1]
+            name = f&#34;\n{player.player_name}&#34;
+            string = &#34; has rolled a 1 and lost all points this round.\n&#34;
+            score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}&#34;
+            points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+            return name + string + points + score
+        player = self.active_players[self.game_state]
+        name = f&#34;\n{player.player_name}&#34;
+        string = f&#34; has rolled a {roll}&#34;
+        points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+        score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}\n&#34;
+        return name + string + points + score
+
+    def hold(self):
+        &#34;&#34;&#34;
+        Player decides to hold the round points.
+
+        If a player decides to hold the round points
+        will be added to the total points. Afterwards the game evaluates
+        if the totalscore is higher or equal to 100 points.
+        If thats the case the game ends and the current player wins.
+        &#34;&#34;&#34;
+        msg = &#34;No active game!&#34;
+        if self.game_state &lt; 0:
+            return msg
+        player = self.active_players[self.game_state]
+        player.dice_holder.hold()
+        if player.dice_holder.get_total_points() &gt;= 100:
+            self.game_state = -1
+            self.active_ai = 0
+            if self.cheated_game == 0:
+                player.update_scores(1)
+            return f&#34;{player.player_name} has won the game!&#34;
+        self.game_state = (self.game_state + 1) % self.amount_players
+        name = f&#34;\n{player.player_name}&#39;s total points are now: &#34;
+        score = f&#34;{player.dice_holder.get_total_points()}\n&#34;
+        return name + score
+
+    def set_ai(self, state, difficulty):
+        &#34;&#34;&#34;
+        Enable the AI.
+
+        If the state parameter quals to ture the ai will be enabled
+        and the difficulty will be set.
+        Otherwise the ai will be disabled.
+        &#34;&#34;&#34;
+        if state == &#34;true&#34;:
+            self.active_ai = 1
+            self.ai.update_difficulty(difficulty)
+            print(&#34;AI will join the next game!&#34;)
+        else:
+            self.active_ai = 0
+            print(&#34;AI is disabled for the next game!&#34;)
+
+    def play_ai(self):
+        &#34;&#34;&#34;
+        Let the AI do its moves.
+
+        Calls the game loop of the AI.
+        Afterwards a check runs if the AI has won the game.
+        &#34;&#34;&#34;
+        self.ai.evaluate_round()
+        player = self.ai
+        if player.dice_holder.get_total_points() &gt;= 100:
+            self.game_state = -1
+            print(f&#34;{player.player_name} has won the game!&#34;)
+            print(&#34;Type quit to leave the current game.&#34;)
+            self.active_ai = 0
+            return
+        self.game_state = (self.game_state + 1) % self.amount_players
+
+    def quit(self):
+        &#34;&#34;&#34;
+        Pause/Quit current game.
+
+        If a game is currently active it will be paused
+        and the gamestate will be saved.
+        &#34;&#34;&#34;
+        if self.game_state &gt;= 0:
+            self.save_game = self.game_state
+            self.game_state = -1
+
+    def cheat(self):
+        &#34;&#34;&#34;
+        Help a player to win faster.
+
+        Set the current players points to 99.
+        &#34;&#34;&#34;
+        self.cheated_game = 1
+        self.active_players[self.game_state].dice_holder.totalpoints = 99
+        print(&#34;You cheated!\nYour total points are set to 99.&#34;)
+
+    def restart(self):
+        &#34;&#34;&#34;
+        Restart paused game.
+
+        If a running game has been quit it will be restarted
+        and the saved data will be loaded.
+        &#34;&#34;&#34;
+        if self.save_game &gt; 0:
+            self.game_state = self.save_game
+        else:
+            print(&#34;There is no paused game!&#34;)
+
+    def show_histogram(self):
+        &#34;&#34;&#34;
+        Show all players stats.
+
+        Prints out charts about each players stats.
+        Returns true if histogram is displayed sucessfully.
+        &#34;&#34;&#34;
+        histogram = Histogram()
+        histogram.display(self.players)
+        return True
 
     def exit(self):
-        &#34;&#34;&#34;Save players and exit&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Save players and exit.
+
+        Method will be called when the user exits the program,
+        The playerlist will be saved as a binary file.
+        &#34;&#34;&#34;
         with open(&#34;players.dat&#34;, &#34;wb&#34;) as file:
             pickle.dump(self.players, file)
         return &#34;Thank you for playing!&#34;</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="pig_game.Game.cheat"><code class="name flex">
+<span>def <span class="ident">cheat</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Help a player to win faster.</p>
+<p>Set the current players points to 99.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cheat(self):
+    &#34;&#34;&#34;
+    Help a player to win faster.
+
+    Set the current players points to 99.
+    &#34;&#34;&#34;
+    self.cheated_game = 1
+    self.active_players[self.game_state].dice_holder.totalpoints = 99
+    print(&#34;You cheated!\nYour total points are set to 99.&#34;)</code></pre>
+</details>
+</dd>
 <dt id="pig_game.Game.create_player"><code class="name flex">
 <span>def <span class="ident">create_player</span></span>(<span>self, names)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create players with a list of names.</p></div>
+<div class="desc"><p>Create a new player object.</p>
+<p>Loops through a list of player names.
+Create a new player is the given name isn't taken.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_player(self, names):
-    &#34;&#34;&#34;Create players with a list of names.&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Create a new player object.
+
+    Loops through a list of player names.
+    Create a new player is the given name isn&#39;t taken.
+    &#34;&#34;&#34;
     for name in names:
         taken = 0
         if len(self.players) &gt; 0:
@@ -254,12 +638,20 @@ has rolled a 1 and lost all points this round.&#34;
 <span>def <span class="ident">delete_player</span></span>(<span>self, name)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Delete player from list.</p>
+<p>Delete the player object from the player list if the name matches.
+Needs confirmation before deleting.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def delete_player(self, name):
+    &#34;&#34;&#34;
+    Delete player from list.
+
+    Delete the player object from the player list if the name matches.
+    Needs confirmation before deleting.
+    &#34;&#34;&#34;
     for player in self.players:
         if player.player_name == name:
             confirm = input(f&#34;Proceed with deleting Player {name}? [y/N] &#34;)
@@ -274,28 +666,127 @@ has rolled a 1 and lost all points this round.&#34;
 <span>def <span class="ident">exit</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Save players and exit</p></div>
+<div class="desc"><p>Save players and exit.</p>
+<p>Method will be called when the user exits the program,
+The playerlist will be saved as a binary file.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exit(self):
-    &#34;&#34;&#34;Save players and exit&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Save players and exit.
+
+    Method will be called when the user exits the program,
+    The playerlist will be saved as a binary file.
+    &#34;&#34;&#34;
     with open(&#34;players.dat&#34;, &#34;wb&#34;) as file:
         pickle.dump(self.players, file)
     return &#34;Thank you for playing!&#34;</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.hold"><code class="name flex">
+<span>def <span class="ident">hold</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Player decides to hold the round points.</p>
+<p>If a player decides to hold the round points
+will be added to the total points. Afterwards the game evaluates
+if the totalscore is higher or equal to 100 points.
+If thats the case the game ends and the current player wins.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hold(self):
+    &#34;&#34;&#34;
+    Player decides to hold the round points.
+
+    If a player decides to hold the round points
+    will be added to the total points. Afterwards the game evaluates
+    if the totalscore is higher or equal to 100 points.
+    If thats the case the game ends and the current player wins.
+    &#34;&#34;&#34;
+    msg = &#34;No active game!&#34;
+    if self.game_state &lt; 0:
+        return msg
+    player = self.active_players[self.game_state]
+    player.dice_holder.hold()
+    if player.dice_holder.get_total_points() &gt;= 100:
+        self.game_state = -1
+        self.active_ai = 0
+        if self.cheated_game == 0:
+            player.update_scores(1)
+        return f&#34;{player.player_name} has won the game!&#34;
+    self.game_state = (self.game_state + 1) % self.amount_players
+    name = f&#34;\n{player.player_name}&#39;s total points are now: &#34;
+    score = f&#34;{player.dice_holder.get_total_points()}\n&#34;
+    return name + score</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.play_ai"><code class="name flex">
+<span>def <span class="ident">play_ai</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Let the AI do its moves.</p>
+<p>Calls the game loop of the AI.
+Afterwards a check runs if the AI has won the game.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def play_ai(self):
+    &#34;&#34;&#34;
+    Let the AI do its moves.
+
+    Calls the game loop of the AI.
+    Afterwards a check runs if the AI has won the game.
+    &#34;&#34;&#34;
+    self.ai.evaluate_round()
+    player = self.ai
+    if player.dice_holder.get_total_points() &gt;= 100:
+        self.game_state = -1
+        print(f&#34;{player.player_name} has won the game!&#34;)
+        print(&#34;Type quit to leave the current game.&#34;)
+        self.active_ai = 0
+        return
+    self.game_state = (self.game_state + 1) % self.amount_players</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.quit"><code class="name flex">
+<span>def <span class="ident">quit</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pause/Quit current game.</p>
+<p>If a game is currently active it will be paused
+and the gamestate will be saved.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quit(self):
+    &#34;&#34;&#34;
+    Pause/Quit current game.
+
+    If a game is currently active it will be paused
+    and the gamestate will be saved.
+    &#34;&#34;&#34;
+    if self.game_state &gt;= 0:
+        self.save_game = self.game_state
+        self.game_state = -1</code></pre>
 </details>
 </dd>
 <dt id="pig_game.Game.rename_player"><code class="name flex">
 <span>def <span class="ident">rename_player</span></span>(<span>self, name)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Rename player's object.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def rename_player(self, name):
+    &#34;&#34;&#34;Rename player&#39;s object.&#34;&#34;&#34;
     for player in self.players:
         if player.player_name == name:
             player.change_name()
@@ -303,55 +794,178 @@ has rolled a 1 and lost all points this round.&#34;
     return False</code></pre>
 </details>
 </dd>
-<dt id="pig_game.Game.roll"><code class="name flex">
-<span>def <span class="ident">roll</span></span>(<span>self)</span>
+<dt id="pig_game.Game.restart"><code class="name flex">
+<span>def <span class="ident">restart</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Player decides to roll the dice.</p></div>
+<div class="desc"><p>Restart paused game.</p>
+<p>If a running game has been quit it will be restarted
+and the saved data will be loaded.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">    def roll(self):
-        &#34;&#34;&#34;Player decides to roll the dice.&#34;&#34;&#34;
-        if self.game_state &lt; 0:
-            return &#34;No active game!&#34;
-        dice = Dice()
-        dice_num = dice.roll()
-        if dice_num == 1:
-            return f&#34;{self.players[self.game_state].name}\
-has rolled a 1 and lost all points this round.&#34;
-        return f&#34;{self.players[self.game_state].name} has rolled a {dice_num}.&#34;</code></pre>
+<pre><code class="python">def restart(self):
+    &#34;&#34;&#34;
+    Restart paused game.
+
+    If a running game has been quit it will be restarted
+    and the saved data will be loaded.
+    &#34;&#34;&#34;
+    if self.save_game &gt; 0:
+        self.game_state = self.save_game
+    else:
+        print(&#34;There is no paused game!&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.roll"><code class="name flex">
+<span>def <span class="ident">roll</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Player decides to roll the dice.</p>
+<p>Select the active player and use the roll_dice method.
+The player returns the result of the roll.
+If a 1 is rolled, the active player will change and then
+the round score will be printed.
+If something else is rolled, the stats will be printed
+and the player may continue to roll.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def roll(self):
+    &#34;&#34;&#34;
+    Player decides to roll the dice.
+
+    Select the active player and use the roll_dice method.
+    The player returns the result of the roll.
+    If a 1 is rolled, the active player will change and then
+    the round score will be printed.
+    If something else is rolled, the stats will be printed
+    and the player may continue to roll.
+    &#34;&#34;&#34;
+    msg = &#34;No active game!&#34;
+    if self.game_state &lt; 0:
+        return msg
+    roll = self.active_players[self.game_state].roll_dice()
+    if roll == 1:
+        self.game_state = (self.game_state + 1) % self.amount_players
+        player = self.active_players[self.game_state - 1]
+        name = f&#34;\n{player.player_name}&#34;
+        string = &#34; has rolled a 1 and lost all points this round.\n&#34;
+        score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}&#34;
+        points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+        return name + string + points + score
+    player = self.active_players[self.game_state]
+    name = f&#34;\n{player.player_name}&#34;
+    string = f&#34; has rolled a {roll}&#34;
+    points = f&#34;\nRound score: {player.dice_holder.get_round_points()}&#34;
+    score = f&#34;\nTotal score: {player.dice_holder.get_total_points()}\n&#34;
+    return name + string + points + score</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.set_ai"><code class="name flex">
+<span>def <span class="ident">set_ai</span></span>(<span>self, state, difficulty)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable the AI.</p>
+<p>If the state parameter quals to ture the ai will be enabled
+and the difficulty will be set.
+Otherwise the ai will be disabled.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_ai(self, state, difficulty):
+    &#34;&#34;&#34;
+    Enable the AI.
+
+    If the state parameter quals to ture the ai will be enabled
+    and the difficulty will be set.
+    Otherwise the ai will be disabled.
+    &#34;&#34;&#34;
+    if state == &#34;true&#34;:
+        self.active_ai = 1
+        self.ai.update_difficulty(difficulty)
+        print(&#34;AI will join the next game!&#34;)
+    else:
+        self.active_ai = 0
+        print(&#34;AI is disabled for the next game!&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pig_game.Game.show_histogram"><code class="name flex">
+<span>def <span class="ident">show_histogram</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Show all players stats.</p>
+<p>Prints out charts about each players stats.
+Returns true if histogram is displayed sucessfully.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_histogram(self):
+    &#34;&#34;&#34;
+    Show all players stats.
+
+    Prints out charts about each players stats.
+    Returns true if histogram is displayed sucessfully.
+    &#34;&#34;&#34;
+    histogram = Histogram()
+    histogram.display(self.players)
+    return True</code></pre>
 </details>
 </dd>
 <dt id="pig_game.Game.start"><code class="name flex">
 <span>def <span class="ident">start</span></span>(<span>self, args)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Start a new game.</p></div>
+<div class="desc"><p>Start a new game.</p>
+<p>Checks how many players will join the game,
+will enable AI if only 1 player joins.
+After the amount of players is checked all provided players
+will be moved into the active player list.
+If everything is sucessfull the gamestate will be set to 0.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def start(self, args):
-    &#34;&#34;&#34;Start a new game.&#34;&#34;&#34;
-    player_names = args.split()
+    &#34;&#34;&#34;
+    Start a new game.
+
+    Checks how many players will join the game,
+    will enable AI if only 1 player joins.
+    After the amount of players is checked all provided players
+    will be moved into the active player list.
+    If everything is sucessfull the gamestate will be set to 0.
+    &#34;&#34;&#34;
+    player_names = args.split(&#34;,&#34;)
     if len(player_names) &gt; 6 or len(player_names) &lt; 1:
         raise ValueError(&#34;The amount of players must be between 1 and 6.&#34;)
-    self.amount_players = len(player_names)
+    if len(player_names) == 1:
+        self.active_ai = 1
+        print(&#34;AI will join this game!&#34;)
 
+    self.active_players = []
+    self.ai.dice_holder.reset()
     for name in player_names:
         player_exists = False
         for player in self.players:
-            if player.player_name == name:
+            if player.player_name == name.strip():
                 player_exists = True
+                player.dice_holder.reset()
                 self.active_players.append(player)
+                if self.active_ai == 1:
+                    self.active_ai = 2
+                    self.active_players.append(self.ai)
                 break
         if not player_exists:
-            print(f&#34;Player {name} doesnt have a profile yet!&#34;)
+            print(f&#34;Player {name.strip()} doesnt have a profile yet!&#34;)
             return False
 
     self.game_state = 0
+    self.amount_players = len(self.active_players)
     return self.active_players[0]</code></pre>
 </details>
 </dd>
@@ -371,11 +985,18 @@ has rolled a 1 and lost all points this round.&#34;
 <li>
 <h4><code><a title="pig_game.Game" href="#pig_game.Game">Game</a></code></h4>
 <ul class="two-column">
+<li><code><a title="pig_game.Game.cheat" href="#pig_game.Game.cheat">cheat</a></code></li>
 <li><code><a title="pig_game.Game.create_player" href="#pig_game.Game.create_player">create_player</a></code></li>
 <li><code><a title="pig_game.Game.delete_player" href="#pig_game.Game.delete_player">delete_player</a></code></li>
 <li><code><a title="pig_game.Game.exit" href="#pig_game.Game.exit">exit</a></code></li>
+<li><code><a title="pig_game.Game.hold" href="#pig_game.Game.hold">hold</a></code></li>
+<li><code><a title="pig_game.Game.play_ai" href="#pig_game.Game.play_ai">play_ai</a></code></li>
+<li><code><a title="pig_game.Game.quit" href="#pig_game.Game.quit">quit</a></code></li>
 <li><code><a title="pig_game.Game.rename_player" href="#pig_game.Game.rename_player">rename_player</a></code></li>
+<li><code><a title="pig_game.Game.restart" href="#pig_game.Game.restart">restart</a></code></li>
 <li><code><a title="pig_game.Game.roll" href="#pig_game.Game.roll">roll</a></code></li>
+<li><code><a title="pig_game.Game.set_ai" href="#pig_game.Game.set_ai">set_ai</a></code></li>
+<li><code><a title="pig_game.Game.show_histogram" href="#pig_game.Game.show_histogram">show_histogram</a></code></li>
 <li><code><a title="pig_game.Game.start" href="#pig_game.Game.start">start</a></code></li>
 </ul>
 </li>
