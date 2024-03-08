@@ -40,13 +40,35 @@ class TestPlayerClass(unittest.TestCase):
         exp = 2
         self.assertEqual(exp, res)
 
-    # def test_difficulty(self):
-    #     """Test if the difficulty changes correctly."""
-    #     binarybrain = BinaryBrain()
-    #
-    #     res = binarybrain.evaluate_round.keep_going
-    #     exp = binarybrain.easy
-    #     self.assertEqual(res, exp)
+    @patch('game.intelligence.BinaryBrain.easy')
+    def test_difficulty_easy(self, mock_easy):
+        """Test if the difficulty changes correctly."""
+        mock_easy.return_value = False
+        binarybrain = BinaryBrain()
+        binarybrain.difficulty = 0
+        binarybrain.evaluate_round()
+        res = binarybrain.keep_going
+        self.assertFalse(res)
+
+    @patch('game.intelligence.BinaryBrain.medium')
+    def test_difficulty_medium(self, mock_medium):
+        """Test if the difficulty changes correctly."""
+        mock_medium.return_value = False
+        binarybrain = BinaryBrain()
+        binarybrain.difficulty = 1
+        binarybrain.evaluate_round()
+        res = binarybrain.keep_going
+        self.assertFalse(res)
+
+    @patch('game.intelligence.BinaryBrain.hard')
+    def test_difficulty_hard(self, mock_hard):
+        """Test if the difficulty changes correctly."""
+        mock_hard.return_value = False
+        binarybrain = BinaryBrain()
+        binarybrain.difficulty = 2
+        binarybrain.evaluate_round()
+        res = binarybrain.keep_going
+        self.assertFalse(res)
 
     @patch('game.intelligence.BinaryBrain.roll_dice')
     def test_roll(self, mock_roll_dice):
@@ -73,11 +95,64 @@ class TestPlayerClass(unittest.TestCase):
         exp = 20
         self.assertEqual(exp, res)
 
-    def test_easy(self):
-        """Test the easy difficulty."""
+    def test_easy_hold(self):
+        """Test the easy difficulties hold abilty."""
         binarybrain = BinaryBrain()
-        binarybrain.easy()
+        binarybrain.dice_holder.roundpoints = 20
+        res = binarybrain.easy()
+        self.assertFalse(res)
 
-        res = binarybrain.dice_holder.get_total_points()
-        exp = 0 <= res <= 20
-        self.assertTrue(exp)
+    @patch('game.intelligence.BinaryBrain.roll')
+    def test_easy_roll(self, mock_roll):
+        """Test the easy difficulties roll abilty."""
+        mock_roll.return_value = True
+        binarybrain = BinaryBrain()
+        res = binarybrain.easy()
+        self.assertTrue(res)
+
+    def test_medium_hold(self):
+        """Test the medium difficulties hold abilty."""
+        binarybrain = BinaryBrain()
+        binarybrain.dice_holder.roundpoints = 25
+        res = binarybrain.medium()
+        self.assertFalse(res)
+
+    @patch('game.intelligence.BinaryBrain.roll')
+    def test_medium_roll(self, mock_roll):
+        """Test the easy difficulties roll abilty."""
+        mock_roll.return_value = True
+        binarybrain = BinaryBrain()
+        res = binarybrain.medium()
+        self.assertTrue(res)
+
+    def test_hard_hold(self):
+        """Test the hard difficulties hold abilty."""
+        binarybrain = BinaryBrain()
+        binarybrain.dice_holder.roundpoints = 30
+        res = binarybrain.hard()
+        self.assertFalse(res)
+
+        binarybrain.dice_holder.totalpoints = 72
+        binarybrain.dice_holder.roundpoints = 28
+        res = binarybrain.hard()
+        self.assertFalse(res)
+
+    @patch('game.intelligence.BinaryBrain.roll')
+    @patch('random.randint')
+    def test_hard_roll(self, mock_roll, mock_random):
+        """Test the hard difficulties roll abilty."""
+        mock_roll.return_value = True
+        mock_random.return_value = 1
+        binarybrain = BinaryBrain()
+        binarybrain.dice_holder.roundpoints = 24
+        res = binarybrain.hard()
+        self.assertTrue(res)
+
+        binarybrain.dice_holder.roundpoints = 18
+        res = binarybrain.hard()
+        self.assertTrue(res)
+
+        binarybrain.dice_holder.totalpoints = 72
+        binarybrain.dice_holder.roundpoints = 18
+        res = binarybrain.hard()
+        self.assertTrue(res)

@@ -26,6 +26,7 @@ class BinaryBrain:
         self.dice_holder = DiceHand()
         self.player_name = "BinaryBrain"
         self.difficulty = 0
+        self.keep_going = True
         random.seed()
 
     def roll_dice(self):
@@ -57,15 +58,15 @@ class BinaryBrain:
         Loop which runs until the AI decides to hold its points or rolls a 1.
         Starts a different algorithm according to the difficulty varaible.
         """
-        keep_going = True
-        while keep_going:
+        self.keep_going = True
+        while self.keep_going:
             match self.difficulty:
                 case 0:
-                    keep_going = self.easy()
+                    self.keep_going = self.easy()
                 case 1:
-                    keep_going = self.medium()
+                    self.keep_going = self.medium()
                 case 2:
-                    keep_going = self.hard()
+                    self.keep_going = self.hard()
 
     def roll(self):
         """
