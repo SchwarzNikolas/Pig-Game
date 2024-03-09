@@ -17,17 +17,16 @@ class TestGameClass(unittest.TestCase):
         exp = Game
         self.assertIsInstance(res, exp)
 
-    @patch("sys.stdout", new_callable=io.StringIO)
     @patch('builtins.open', side_effect=FileNotFoundError)
-    def test_no_saved_players(self, mock_open, mock_stdout):
+    def test_no_saved_players(self, mock_open):
         """Test starting the game without a old player save."""
         game = Game()
-        res = mock_stdout.getvalue()
-        exp = "No saved players found.\n"
+        res = game.players
+        exp = []
         self.assertEqual(exp, res)
 
     def test_start_no_profile(self):
-        """Test if the game will not start if a player doesnt have a profile."""
+        """Test if the game won't start if a player doesnt have a profile."""
         sys.stdout = io.StringIO()
         game = Game()
         res = game.start("Test")

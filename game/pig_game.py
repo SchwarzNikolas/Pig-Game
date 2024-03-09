@@ -31,7 +31,7 @@ class Game:
             with open("players.dat", "rb") as file:
                 self.players = pickle.load(file)
         except FileNotFoundError:
-            print("No saved players found.")
+            self.players = []
         self.active_players = []
         self.game_state = -1
         self.amount_players = 0
