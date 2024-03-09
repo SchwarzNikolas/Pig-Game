@@ -29,7 +29,7 @@ Clone the repository:
 ```bash
 git clone https://github.com/SchwarzNikolas/Pig-Game.git
 ```
-Use the [make](https://www.gnu.org/software/make/) to create a virtual python environment:
+Got into the game's directory and use the [make](https://www.gnu.org/software/make/) to create a virtual python environment:
 ```bash
 make venv
 ```
