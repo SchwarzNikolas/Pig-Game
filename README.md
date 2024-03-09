@@ -1,4 +1,3 @@
-
 # Pig-Game
 <p align="center">
 <a href="https://github.com/SchwarzNikolas/Pig-Game/actions"><img alt="Actions Status" src="https://github.com/SchwarzNikolas/Pig-Game/actions/workflows/python-app.yml/badge.svg"></a>
