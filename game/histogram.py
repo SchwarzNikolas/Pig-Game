@@ -15,7 +15,7 @@ class Histogram:
 
     def barchart(self, name, num, colour, scale):
         """Print out the bar."""
-        box = "∎" * int(num / scale)
+        box = "*" * int(num / scale)
         print(f"{name:^10} | {num:^5} | {colour}{box[:35]}{self.end}")
         print(f"{'>< ' * 19 }")
 
@@ -23,11 +23,11 @@ class Histogram:
         """Key to assist reading Histograms."""
         print("------------ KEY ------------")
         print(f"{'=' * 29}")
-        print(f"{self.colour1}∎  | {'lowest rolls':^16} |  1:17{self.end}")
-        print(f"{self.colour2}∎  | {'lowest rounds':^16} |   1:2{self.end}")
-        print(f"{self.colour3}∎  | {'highest points':^16} |   1:6{self.end}")
-        print(f"{self.colour4}∎  | {'all time points':^16} | 1:100{self.end}")
-        print(f"{self.colour5}∎  | {'all time wins':^16} |   1:1{self.end}")
+        print(f"{self.colour1}*  | {'lowest rolls':^16} |  1:17{self.end}")
+        print(f"{self.colour2}*  | {'lowest rounds':^16} |   1:2{self.end}")
+        print(f"{self.colour3}*  | {'highest points':^16} |   1:6{self.end}")
+        print(f"{self.colour4}*  | {'all time points':^16} | 1:100{self.end}")
+        print(f"{self.colour5}*  | {'all time wins':^16} |   1:1{self.end}")
         print(f"{'=' * 29}")
         print("Note on scale -> block:score\n")
 
