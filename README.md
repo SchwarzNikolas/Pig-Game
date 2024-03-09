@@ -33,6 +33,15 @@ Go into the game's directory and use the [make](https://www.gnu.org/software/mak
 ```bash
 make venv
 ```
+Enter the virtual environment:
+ - For Unix and MacOS:
+  ```
+  . .venv/bin/activate
+  ```
+  - For Windows:
+  ```
+  . .venv/Scripts/activate
+  ```
 Install required libraries:
 ```bash
 make install
@@ -58,16 +67,6 @@ foobar.singularize('phenomena')
 ```
 
 ## Testing
-
-To unittest the classes enter venv:
- - For Unix and MacOS:
-  ```
-  . .venv/bin/activate
-  ```
-  - For Windows:
-  ```
-  . .venv/Scripts/activate
-  ```
 
 Start the Unittests:
 ```bash
