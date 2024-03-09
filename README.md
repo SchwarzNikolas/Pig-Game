@@ -17,11 +17,11 @@ Python implementation of the Pig Dice Game.
    * [License](#license)
 
 ## Rules
-This game is a dice game played to reach a target scoreof 100 points.
+This is a dice game played to reach a target scoreof 100 points.
 Players take turns rolling a dice.
-If a player rolls a 1, they lose their turn's points and it's the next player's turn.
+If a player rolls a 1, they lose their points for that turn and then it's the next player's turn.
 Otherwise, they can keep rolling and adding points, or choose to hold and keep their accumulated points.
-The first player to reach or exceed the target score wins.
+The first player to reach or exceed the target score wins when they hold.
 
 ## Installation
 
