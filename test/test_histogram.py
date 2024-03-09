@@ -21,7 +21,7 @@ class TestHistogramClass(unittest.TestCase):
         """Test the bar chart."""
         histogram = Histogram()
         histogram.barchart("Test", 1, histogram.colour1, 1)
-        exp1 = f"   Test    |   1   | {histogram.colour1}∎{histogram.end}\n"
+        exp1 = f"   Test    |   1   | {histogram.colour1}*{histogram.end}\n"
         exp2 = ">< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< \n"
         exp = exp1 + exp2
         self.assertEqual(exp, mock_stdout.getvalue())
@@ -33,11 +33,11 @@ class TestHistogramClass(unittest.TestCase):
         his.key()
         exp1 = "------------ KEY ------------\n"
         exp2 = f"{'=' * 29}\n"
-        exp3 = f"{his.colour1}∎  | {'lowest rolls':^16} |  1:17{his.end}\n"
-        exp4 = f"{his.colour2}∎  | {'lowest rounds':^16} |   1:2{his.end}\n"
-        exp5 = f"{his.colour3}∎  | {'highest points':^16} |   1:6{his.end}\n"
-        exp6 = f"{his.colour4}∎  | {'all time points':^16} | 1:100{his.end}\n"
-        exp7 = f"{his.colour5}∎  | {'all time wins':^16} |   1:1{his.end}\n"
+        exp3 = f"{his.colour1}*  | {'lowest rolls':^16} |  1:17{his.end}\n"
+        exp4 = f"{his.colour2}*  | {'lowest rounds':^16} |   1:2{his.end}\n"
+        exp5 = f"{his.colour3}*  | {'highest points':^16} |   1:6{his.end}\n"
+        exp6 = f"{his.colour4}*  | {'all time points':^16} | 1:100{his.end}\n"
+        exp7 = f"{his.colour5}*  | {'all time wins':^16} |   1:1{his.end}\n"
         exp8 = f"{'=' * 29}\n"
         exp9 = "Note on scale -> block:score\n\n"
         exp = exp1 + exp2 + exp3 + exp4 + exp5 + exp6 + exp7 + exp8 + exp9
@@ -53,11 +53,11 @@ class TestHistogramClass(unittest.TestCase):
         his.display(players)
         exp1 = "------------ KEY ------------\n"
         exp2 = f"{'=' * 29}\n"
-        exp3 = f"{his.colour1}∎  | {'lowest rolls':^16} |  1:17{his.end}\n"
-        exp4 = f"{his.colour2}∎  | {'lowest rounds':^16} |   1:2{his.end}\n"
-        exp5 = f"{his.colour3}∎  | {'highest points':^16} |   1:6{his.end}\n"
-        exp6 = f"{his.colour4}∎  | {'all time points':^16} | 1:100{his.end}\n"
-        exp7 = f"{his.colour5}∎  | {'all time wins':^16} |   1:1{his.end}\n"
+        exp3 = f"{his.colour1}*  | {'lowest rolls':^16} |  1:17{his.end}\n"
+        exp4 = f"{his.colour2}*  | {'lowest rounds':^16} |   1:2{his.end}\n"
+        exp5 = f"{his.colour3}*  | {'highest points':^16} |   1:6{his.end}\n"
+        exp6 = f"{his.colour4}*  | {'all time points':^16} | 1:100{his.end}\n"
+        exp7 = f"{his.colour5}*  | {'all time wins':^16} |   1:1{his.end}\n"
         exp8 = f"{'=' * 29}\n"
         exp9 = "Note on scale -> block:score\n\n"
         exp1_1 = exp1 + exp2 + exp3 + exp4 + exp5 + exp6 + exp7 + exp8 + exp9
