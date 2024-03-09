@@ -61,9 +61,13 @@ foobar.singularize('phenomena')
 
 To unittest the classes enter venv:
  - For Unix and MacOS:
-  ```. .venv/bin/activate```
+  ```
+  . .venv/bin/activate
+  ```
   - For Windows:
-  ```. .venv/Scripts/activate```
+  ```
+  . .venv/Scripts/activate
+  ```
 
 Start the Unittests:
 ```bash
