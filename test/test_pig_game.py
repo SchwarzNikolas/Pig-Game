@@ -17,7 +17,7 @@ class TestGameClass(unittest.TestCase):
         exp = Game
         self.assertIsInstance(res, exp)
 
-    @patch('builtins.open', side_effect=FileNotFoundError)
+    @patch("builtins.open", side_effect=FileNotFoundError)
     def test_no_saved_players(self, mock_open):
         """Test starting the game without a old player save."""
         game = Game()
